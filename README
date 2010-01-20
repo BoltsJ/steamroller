@@ -1,0 +1,11 @@
+  .---.
+ | ^_^ | Clyde: An AUR helper that creates a local repo 
+ |     |   from which pacman install packages.
+ |.-.-.|   
+
+Initial testing release
+ - Add packages to repo defined in /etc/clyde.conf with
+     `clyde -S [name of package]`
+ - Update pacman sync database after building packages with -y
+ - Add package to repo from local taurball with 
+     `clyde -U /path/to/taurball.tar.gz [pkgname]`

@@ -18,13 +18,15 @@
 
 use strict;
 use warnings;
+use LWP::Simple qw(get);
 require Exporter;
-#package Clyde;
-our @EXPORT = qw/getaurpkg exttaurball makepkg repoadd syu/;
+our @EXPORT = qw/getaurpkg exttaurball makepkg repoadd pacsy aurcheck/;
 our $VERSION = 0.01;
 
 our %repo;
 our $tmpdir;
+
+our $aurrpc = "http://aur.archlinux.org/rpc.php";
 
 sub getaurpkg ($) {
     my $pkg = shift;
@@ -79,11 +81,40 @@ sub repoadd (%$) {
     return 1;
 }
 
-sub syu () {
+sub pacsy () {
     our $pacmanbin;
     system("sudo $pacmanbin -Sy") &&
     return 0;
     return 1;
+}
+
+sub aurcheck (%) {
+    my @upgrades;
+    my $pkg;
+    my $pkgver;
+    my $pkginfo;
+    my $aurver;
+    my %repopkgs;
+    my %repo = @_;
+    opendir REPO, $repo{dir};
+    my @repofiles = readdir REPO;
+    closedir REPO;
+    chdir $repo{dir};
+    foreach(@repofiles) {
+        next unless /\.pkg\.tar\.gz$/;
+        $pkginfo = `/usr/bin/bsdtar -xOf $_ .PKGINFO`;
+        $pkginfo =~ /pkgver\s+=\s+(\S+)\n/;
+        $pkgver = $1;
+        $pkginfo =~ /pkgname\s+=\s+(\S+)\n/;
+        $pkg = $1;
+        $repopkgs{$pkg} = $pkgver;
+    }
+    foreach(sort keys %repopkgs) {
+        $aurver = get("$aurrpc?type=info&arg=$_");
+        $aurver =~ s/.*"Version":"(.+?)".*/$1/ || next;
+        push @upgrades, $_ if `/usr/bin/vercmp $aurver $repopkgs{$_}` == 1;
+    }
+    return @upgrades;
 }
 
 return 1;

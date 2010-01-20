@@ -30,8 +30,6 @@ our %repo;
 our $tmpdir = '/tmp/clyde';
 my @pkgs;
 my %mode;
-my $upkg;
-my $taurball;
 
 # Default Values
 our $editor = $ENV{EDITOR} ||
@@ -41,6 +39,7 @@ our $editor = $ENV{EDITOR} ||
 );
 my $uconf = 1;
 our $pacmanbin = "/usr/bin/pacman";
+
 
 # Parse global config
 open CONF, "/etc/clyde.conf" or
@@ -61,6 +60,10 @@ while(<CONF>) {
     }
     if(/^UserConfig=no/) {
         $uconf = 0;
+        next;
+    }
+    if(/^PacmanBin=(.+?)(\s+#|$)/) {
+        $pacmanbin = $1;
     }
 }
 close CONF;
@@ -68,17 +71,12 @@ if(!$repo{name} && !$repo{dir}) {
     die "RepoName and RepoDir must be set in /etc/clyde.conf\n";
 }
 
+
 # Parse command line options
 while($_ = shift) {
     if(/^-[^-]/) {
-        if(/U/) {
-            $mode{U} = 1;
-            $mode{S} = 0;
-            $taurball = shift;
-            $upkg = shift;
-            last;
-        }
         $mode{S} = 1 if /S/;
+        $mode{U} = 1 if /U/;
         $mode{u} = 1 if /u/;
         $mode{y} = 1 if /y/;
     }
@@ -86,15 +84,17 @@ while($_ = shift) {
     push @pkgs, $_ if /^[^-]/;
 }
 
-# MAIN()
+
+# main()
 if($mode{S}) {
     if($mode{u}) {
-        exit 0;
-#        @pkgs = getupdates $repo{dir};
+        @pkgs = aurcheck %repo or
+        print "Local repo is up to date with AUR\n";
     }
     if($mode{a}) {
         exit 0;
     }
+    exit 0 unless @pkgs;
     foreach(@pkgs) {
         getaurpkg $_;
         exttaurball $_;
@@ -102,16 +102,21 @@ if($mode{S}) {
         die "Build of $_ failed.\n";
         repoadd %repo, $pkgf;
     }
-    syu if $mode{y};
+    pacsy if $mode{y};
     exit 0;
 }
 
 if($mode{U}) {
-    mkdir $tmpdir;
-    system("cp $taurball $tmpdir/$upkg.tar.gz");
-    exttaurball $upkg;
-    my $pkgf = makepkg $upkg;
-    repoadd %repo, $pkgf;
+    foreach(@pkgs) {
+        mkdir $tmpdir;
+        my $upkg = `/usr/bin/bsdtar -xOf $_ */PKGBUILD`;
+        $upkg =~ /pkgname=(.+)\n/;
+        $upkg = $1;
+        system("cp $_ $tmpdir/$upkg.tar.gz");
+        exttaurball $upkg;
+        my $pkgf = makepkg $upkg;
+        repoadd %repo, $pkgf;
+    }
 }
 
 
