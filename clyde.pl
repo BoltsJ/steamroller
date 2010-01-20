@@ -81,6 +81,7 @@ while($_ = shift) {
         $mode{y} = 1 if /y/;
     }
     $mode{S} = 1 if /^--sync$/;
+    $mode{u} = 1 if /^--update$/;
     push @pkgs, $_ if /^[^-]/;
 }
 
@@ -88,11 +89,8 @@ while($_ = shift) {
 # main()
 if($mode{S}) {
     if($mode{u}) {
-        @pkgs = aurcheck %repo or
+        @pkgs = aurcheck or
         print "Local repo is up to date with AUR\n";
-    }
-    if($mode{a}) {
-        exit 0;
     }
     exit 0 unless @pkgs;
     foreach(@pkgs) {
@@ -100,7 +98,7 @@ if($mode{S}) {
         exttaurball $_;
         my $pkgf = makepkg $_ ||
         die "Build of $_ failed.\n";
-        repoadd %repo, $pkgf;
+        repoadd $pkgf;
     }
     pacsy if $mode{y};
     exit 0;
@@ -115,8 +113,10 @@ if($mode{U}) {
         system("cp $_ $tmpdir/$upkg.tar.gz");
         exttaurball $upkg;
         my $pkgf = makepkg $upkg;
-        repoadd %repo, $pkgf;
+        repoadd $pkgf;
     }
+    pacsy if $mode{y};
+    exit 0;
 }
 
 

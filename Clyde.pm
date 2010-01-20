@@ -20,7 +20,7 @@ use strict;
 use warnings;
 use LWP::Simple qw(get);
 require Exporter;
-our @EXPORT = qw/getaurpkg exttaurball makepkg repoadd pacsy aurcheck/;
+our @EXPORT = qw/getaurpkg exttaurball finddeps makepkg repoadd pacsy aurcheck/;
 our $VERSION = 0.01;
 
 our %repo;
@@ -47,6 +47,25 @@ sub exttaurball ($) {
     return 1;
 }
 
+sub finddeps ($) {
+    my $pkg = shift;
+    our $tmpdir;
+    my $pkgbuild = `bsdtar -xOf $tmpdir/$pkg.tar.gz $pkg/PKGBUILD`;
+    my $deps;
+    my @deplist;
+    $pkgbuild =~ /\ndepends=\(([^)]+)\)/;
+    $deps = $1;
+    while($deps =~ s/'([^ ']+)'//) {
+        push @deplist, $1;
+    }
+    $pkgbuild =~ /\nmakedepends=\(([^)]+)\)/;
+    $deps = $1;
+    while($deps =~ s/'([^ ']+)'//) {
+        push @deplist, $1;
+    }
+    return @deplist;
+}
+
 sub makepkg ($) {
     my $pkg = shift;
     my $pkgf;
@@ -71,9 +90,9 @@ sub makepkg ($) {
     return $pkgf;
 }
 
-sub repoadd (%$) {
+sub repoadd ($) {
     my $pkgf = pop;
-    my %repo = @_;
+    our %repo;
     system("mv $tmpdir/$pkgf $repo{dir}") &&
     return 0;
     system("/usr/bin/repo-add $repo{dir}/$repo{name}.db.tar.gz $repo{dir}/$pkgf") &&
@@ -88,14 +107,14 @@ sub pacsy () {
     return 1;
 }
 
-sub aurcheck (%) {
+sub aurcheck () {
     my @upgrades;
     my $pkg;
     my $pkgver;
     my $pkginfo;
     my $aurver;
     my %repopkgs;
-    my %repo = @_;
+    our %repo;
     opendir REPO, $repo{dir};
     my @repofiles = readdir REPO;
     closedir REPO;
