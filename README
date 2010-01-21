@@ -3,9 +3,37 @@
  |     |   from which pacman installs packages.
  |.-.-.|   
 
-Initial testing release
- - Add packages to repo defined in /etc/clyde.conf with
-     `clyde -S [name of package]`
- - Update pacman sync database after building packages with -y
- - Add package to repo from local taurball with `clyde -U /path/to/taurball.tar.gz`
- - Update repo from AUR with `clyde -Su`
+INSTALLATION:
+  Dependencies:
+    Perl
+    LWP::Simple (perl-libwww)
+    pacman
+    sudo (optional)
+  Files:
+    clyde.conf -> /etc/
+    clyde.pl   -> ${PATH}/clyde and make executable
+    Clyde.pm   -> /usr/share/perl5/vendor_perl/Bolts/
+  Setup:
+    Create a directory to contain the repo.  It must be writable to the user(s)
+      allowed to modify the repo.  $HOME/pkgs is a good choice for a single
+      user system.
+    Edit /etc/clyde.conf to point to the directory containing the repo.  
+      Change any other settings (PacmanBin, RepoName, BuildDir) you desire.
+    Edit /etc/pacman.conf and add the following, substituting clyde.conf 
+      variable names with their values:
+# Local clyde repository
+[<RepoName>]
+Server = file://<RepoDir>
+    Run `clyde -S <pkgname>' to create the repo
+    Run `pacman -Sy <pkgname>' to install the package.
+
+OPTIONS:
+  Modes:
+    -S, --sync : Retrieve taurball for specified packages, build them and add
+        them to the repo
+    -U, --upgrade : Build and add package to the repo from a local taurball
+
+  Sync Options:
+    -u, --update : Check AUR for updates to packages, and build and add to
+        any updates found.
+
