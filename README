@@ -7,6 +7,7 @@ INSTALLATION:
   Dependencies:
     Perl
     LWP::Simple (perl-libwww)
+    JSON::XS (perl-json-xs)
     pacman
     sudo (optional)
   Files:
