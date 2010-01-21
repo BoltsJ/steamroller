@@ -18,9 +18,10 @@
 
 use strict;
 use warnings;
-use LWP::Simple qw(get);
+use LWP::Simple qw(get getstore is_error);
+use JSON::XS qw(decode_json);
 require Exporter;
-our @EXPORT = qw(getaurpkg exttaurball finddeps makepkg repoadd pacsy aurcheck);
+our @EXPORT = qw(getaurpkg exttaurball finddeps makepkg repoadd pacsy aursearch aurcheck);
 our $VERSION = 0.01;
 
 our %repo;
@@ -33,8 +34,10 @@ sub getaurpkg ($) {
     my $aururl = "http://aur.archlinux.org/packages/$pkg/$pkg.tar.gz";
     our $tmpdir;
     mkdir $tmpdir;
-    system("/usr/bin/wget -O '$tmpdir/$pkg.tar.gz' -c '$aururl'") &&
-    return 0;
+    my $resp = getstore($aururl, "$tmpdir/$pkg.tar.gz");
+#    system("/usr/bin/wget -O '$tmpdir/$pkg.tar.gz' -c '$aururl'") &&
+#    return 0;
+    return 0 if is_error($resp);
     return "$tmpdir/$pkg.tar.gz";
 }
 
@@ -117,6 +120,18 @@ sub pacsy () {
         return 0;
     }
     return 1;
+}
+
+sub aursearch($) {
+    my @results;
+    our $aurrpc;
+    my $arg = shift;
+    my $json = get("$aurrpc?type=search&arg=$arg");
+    if($json->{results} eq "No results found") {
+        return 0;
+    } else {
+        return @{$json->{results}};
+    }
 }
 
 sub aurcheck () {

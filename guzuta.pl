@@ -28,6 +28,7 @@ use Bolts::Guzuta;
 # Global declarations
 our %repo;
 our $tmpdir = '/tmp/guzuta';
+our $col = 0;
 my @pkgs;
 my %mode;
 
@@ -54,6 +55,9 @@ while(<CONF>) {
         $repo{dir} = $1;
         next;
     }
+    if(/^Colour=yes/ && -t STDOUT) {
+        $col = 1;
+    }
     if(/^BuildDir=(.+?)(\s+#|$)/) {
         $tmpdir = $1;
         next;
@@ -77,10 +81,12 @@ while($_ = shift) {
     if(/^-[^-]/) {
         $mode{S} = 1 if /S/;
         $mode{U} = 1 if /U/;
+        $mode{s} = 1 if /s/;
         $mode{u} = 1 if /u/;
         $mode{y} = 1 if /y/;
     }
     $mode{S} = 1 if /^--sync$/;
+    $mode{s} = 1 if /^--search$/;
     $mode{u} = 1 if /^--update$/;
     push @pkgs, $_ if /^[^-]/;
 }
@@ -88,6 +94,21 @@ while($_ = shift) {
 
 # main()
 if($mode{S}) {
+    if($mode{s}) {
+        my @results = aursearch $pkgs[0];
+        if(!@results) {
+            print "No results found\n";
+            exit 1;
+        }
+        foreach(@results) {
+            printf "%sAUR/%s$_->{Name} %s$_->{Version}%s\n    $_->{Description}\n",
+            $col ? "\e[35;1m" : "",
+            $col ? "\e[0;1m"  : "",
+            $col ? "\e[32;1m" : "",
+            $col ? "\e[0m"    : "";
+            exit 0;
+        }
+    }
     if($mode{u}) {
         @pkgs = aurcheck or
         print "Local repo is up to date with AUR\n";
@@ -106,8 +127,23 @@ if($mode{S}) {
         unshift @pkgs, $_;
         getaurpkg $_;
         unshift @deplist, finddeps $_;
-    } # TODO Remove duplicate entries from pkglist.
-    foreach(@pkgs) {
+    }
+
+    # Remove duplicate entries from package list
+    my @bpkgs = ();
+    PKG: foreach my $i (@pkgs) {
+        foreach my $j (@bpkgs) {
+            next PKG if $i eq $j;
+        }
+        push @bpkgs, $i;
+    }
+
+    print "Targets: @bpkgs\nProceed with build? [Y/n] ";
+    if(<STDIN> =~ /no?/i) {
+        exit 0;
+    }
+    # build packages in order
+    foreach(@bpkgs) {
         exttaurball $_;
         my $pkgf = makepkg $_ ||
         die "Build of $_ failed.\n";
