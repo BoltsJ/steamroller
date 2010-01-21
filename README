@@ -13,6 +13,7 @@ INSTALLATION:
     clyde.conf -> /etc/
     clyde.pl   -> ${PATH}/clyde and make executable
     Clyde.pm   -> /usr/share/perl5/vendor_perl/Bolts/
+    clyde.1    -> Place in your man path.
   Setup:
     Create a directory to contain the repo.  It must be writable to the user(s)
       allowed to modify the repo.  $HOME/pkgs is a good choice for a single
