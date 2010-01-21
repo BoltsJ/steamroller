@@ -1,15 +1,15 @@
-.TH "CLYDE" "1" "January 2010" "Arch Linux" "User Manuals"
+.TH "GUZUTA" "1" "January 2010" "Arch Linux" "User Manuals"
 .SH "NAME"
-clyde \- An AUR helper that creates a local repo from which pacman installs packages.
+guzuta \- An AUR helper that creates a local repo from which pacman installs packages.
 
 .SH "SYNOPSIS"
-clyde \-S <package name> ...
+guzuta \-S <package name> ...
 
-clyde \-Su
+guzuta \-Su
 
-clyde \-U path/to/taurball.tar.gz ...
+guzuta \-U path/to/taurball.tar.gz ...
 .SH "DESCRIPTION"
-clyde is an AUR helper that places built packages into a local repo where
+guzuta is an AUR helper that places built packages into a local repo where
 .BR pacman (8)
 can install from.
 .SH "OPTIONS"
@@ -24,7 +24,7 @@ them.
 \fB\-U\fR, \fB\-\-upgrade\fR
 Build packages from specified taurballs and add them to the local repo.
 .SH "FILES"
-.I /etc/clyde.conf
+.I /etc/guzuta.conf
 .RS
 The system-wide configuration file.
 .SH "AUTHORS"

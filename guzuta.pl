@@ -19,15 +19,15 @@
 # METADATA
 # Version: 0.0.1
 
-# clyde - A makepkg wrapper with AUR support
+# guzuta - A makepkg wrapper with AUR support
 
 use strict;
 use warnings;
-use Bolts::Clyde;
+use Bolts::Guzuta;
 
 # Global declarations
 our %repo;
-our $tmpdir = '/tmp/clyde';
+our $tmpdir = '/tmp/guzuta';
 my @pkgs;
 my %mode;
 
@@ -42,7 +42,7 @@ our $pacmanbin = "/usr/bin/pacman";
 
 
 # Parse global config
-open CONF, "/etc/clyde.conf" or
+open CONF, "/etc/guzuta.conf" or
 die "Failed to open global configuration file\n";
 while(<CONF>) {
     next if /^\s*#/;
@@ -68,7 +68,7 @@ while(<CONF>) {
 }
 close CONF;
 if(!$repo{name} && !$repo{dir}) {
-    die "RepoName and RepoDir must be set in /etc/clyde.conf\n";
+    die "RepoName and RepoDir must be set in /etc/guzuta.conf\n";
 }
 
 

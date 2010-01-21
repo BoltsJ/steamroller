@@ -1,5 +1,5 @@
   .---.
- | ^_^ | Clyde: An AUR helper that creates a local repo 
+ | ^_^ | Guzuta: An AUR helper that creates a local repo 
  |     |   from which pacman installs packages.
  |.-.-.|   
 
@@ -10,22 +10,21 @@ INSTALLATION:
     pacman
     sudo (optional)
   Files:
-    clyde.conf -> /etc/
-    clyde.pl   -> ${PATH}/clyde and make executable
-    Clyde.pm   -> /usr/share/perl5/vendor_perl/Bolts/
-    clyde.1    -> Place in your man path.
+    guzuta.conf -> /etc/
+    guzuta.pl   -> ${PATH}/guzuta and make executable
+    Guzuta.pm   -> /usr/share/perl5/vendor_perl/Bolts/
   Setup:
     Create a directory to contain the repo.  It must be writable to the user(s)
       allowed to modify the repo.  $HOME/pkgs is a good choice for a single
       user system.
-    Edit /etc/clyde.conf to point to the directory containing the repo.  
+    Edit /etc/guzuta.conf to point to the directory containing the repo.  
       Change any other settings (PacmanBin, RepoName, BuildDir) you desire.
-    Edit /etc/pacman.conf and add the following, substituting clyde.conf 
+    Edit /etc/pacman.conf and add the following, substituting guzuta.conf 
       variable names with their values:
-# Local clyde repository
+# Local guzuta repository
 [<RepoName>]
 Server = file://<RepoDir>
-    Run `clyde -S <pkgname>' to create the repo
+    Run `guzuta -S <pkgname>' to create the repo
     Run `pacman -Sy <pkgname>' to install the package.
 
 OPTIONS:
