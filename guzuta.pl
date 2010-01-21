@@ -118,7 +118,8 @@ if($mode{S}) {
     # Match with $paclst =~ m/^<pattern>$/m
     my @deplist;
     foreach(@pkgs) { # Generate list of AUR dependencies
-        getaurpkg $_;
+        getaurpkg $_ ||
+        die "$_ not found on the AUR\n";
         push @deplist, finddeps $_;
     }
 #       Prepend each AUR dependency to the list of pkgs to add to the repo
