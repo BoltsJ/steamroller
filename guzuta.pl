@@ -125,7 +125,8 @@ if($mode{S}) {
 #       then check its dependencies
     while($_ = pop @deplist) {
         unshift @pkgs, $_;
-        getaurpkg $_;
+        getaurpkg $_ ||
+        die "$_ not found on the AUR\n";
         unshift @deplist, finddeps $_;
     }
 
@@ -144,7 +145,8 @@ if($mode{S}) {
     }
     # build packages in order
     foreach(@bpkgs) {
-        exttaurball $_;
+        exttaurball $_ ||
+        die "Could not extract $tmpdir/$_.tar.gz";
         my $pkgf = makepkg $_ ||
         die "Build of $_ failed.\n";
         repoadd $pkgf ||
