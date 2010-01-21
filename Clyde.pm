@@ -109,8 +109,13 @@ sub repoadd ($) {
 
 sub pacsy () {
     our $pacmanbin;
-    system("sudo $pacmanbin -Sy") &&
-    return 0;
+    if(stat "/usr/bin/sudo") {
+        system("/usr/bin/sudo $pacmanbin -Sy") &&
+        return 0;
+    } else {
+        system("/bin/su -c '$pacmanbin -Sy'") &&
+        return 0;
+    }
     return 1;
 }
 
