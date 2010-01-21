@@ -20,7 +20,7 @@ use strict;
 use warnings;
 use LWP::Simple qw(get);
 require Exporter;
-our @EXPORT = qw/getaurpkg exttaurball finddeps makepkg repoadd pacsy aurcheck/;
+our @EXPORT = qw(getaurpkg exttaurball finddeps makepkg repoadd pacsy aurcheck);
 our $VERSION = 0.01;
 
 our %repo;
@@ -50,18 +50,25 @@ sub exttaurball ($) {
 sub finddeps ($) {
     my $pkg = shift;
     our $tmpdir;
+    our $paclst;
     my $pkgbuild = `bsdtar -xOf $tmpdir/$pkg.tar.gz $pkg/PKGBUILD`;
     my $deps;
     my @deplist;
-    $pkgbuild =~ /\ndepends=\(([^)]+)\)/;
-    $deps = $1;
-    while($deps =~ s/'([^ ']+)'//) {
-        push @deplist, $1;
+    if($pkgbuild =~ /\ndepends=\(([^)]+)\)/) {
+        $deps = $1;
+        while($deps =~ s/'([^ ']+)'//) {
+            my $i = $1;
+            $i =~ s/^([^=<>]+).*?$/$1/;
+            push @deplist, $i unless $paclst =~ m/^$i$/m;
+        }
     }
-    $pkgbuild =~ /\nmakedepends=\(([^)]+)\)/;
-    $deps = $1;
-    while($deps =~ s/'([^ ']+)'//) {
-        push @deplist, $1;
+    if($pkgbuild =~ /\nmakedepends=\(([^)]+)\)/) {
+        $deps = $1;
+        while($deps =~ s/'([^ ']+)'//) {
+            my $i = $1;
+            $i =~ s/^([^=<>]+).*?$/$1/;
+            push @deplist, $i unless $paclst =~ m/^$i$/m;
+        }
     }
     return @deplist;
 }
@@ -114,6 +121,7 @@ sub aurcheck () {
     my $pkginfo;
     my $aurver;
     my %repopkgs;
+    our $aurrpc;
     our %repo;
     opendir REPO, $repo{dir};
     my @repofiles = readdir REPO;

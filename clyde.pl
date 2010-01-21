@@ -19,7 +19,7 @@
 # METADATA
 # Version: 0.0.1
 
-# clyde - A makepkg wrapper with AUR and ABS support
+# clyde - A makepkg wrapper with AUR support
 
 use strict;
 use warnings;
@@ -93,37 +93,47 @@ if($mode{S}) {
         print "Local repo is up to date with AUR\n";
     }
     exit 0 unless @pkgs;
-    foreach(@pkgs) {
+    our $paclst = `$pacmanbin -Sqs`;
+    # Match with $paclst =~ m/^<pattern>$/m
+    my @deplist;
+    foreach(@pkgs) { # Generate list of AUR dependencies
         getaurpkg $_;
+        push @deplist, finddeps $_;
+    }
+#       Prepend each AUR dependency to the list of pkgs to add to the repo
+#       then check its dependencies
+    while($_ = pop @deplist) {
+        unshift @pkgs, $_;
+        getaurpkg $_;
+        unshift @deplist, finddeps $_;
+    } # TODO Remove duplicate entries from pkglist.
+    foreach(@pkgs) {
         exttaurball $_;
         my $pkgf = makepkg $_ ||
         die "Build of $_ failed.\n";
-        repoadd $pkgf;
+        repoadd $pkgf ||
+        die "Failed to add $_ to local repo `$repo{name}'\n";
+        pacsy; # Update pacman repos for build dep resolution.
     }
-    pacsy if $mode{y};
     exit 0;
 }
 
 if($mode{U}) {
+    my @upkgs;
     foreach(@pkgs) {
         mkdir $tmpdir;
         my $upkg = `/usr/bin/bsdtar -xOf $_ */PKGBUILD`;
         $upkg =~ /pkgname=(.+)\n/;
         $upkg = $1;
+        push @upkgs, $upkg;
         system("cp $_ $tmpdir/$upkg.tar.gz");
-        exttaurball $upkg;
-        my $pkgf = makepkg $upkg;
+    }
+    foreach(@upkgs) {
+        exttaurball $_;
+        my $pkgf = makepkg $_;
         repoadd $pkgf;
     }
     pacsy if $mode{y};
     exit 0;
 }
-
-
-
-
-
-
-
-
 
