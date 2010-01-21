@@ -36,4 +36,5 @@ OPTIONS:
   Sync Options:
     -u, --update : Check AUR for updates to packages, and build and add to
         any updates found.
+    -s, --search : Search AUR for string specified.
 
