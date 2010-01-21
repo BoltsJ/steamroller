@@ -106,8 +106,8 @@ if($mode{S}) {
             $col ? "\e[0;1m"  : "",
             $col ? "\e[32;1m" : "",
             $col ? "\e[0m"    : "";
-            exit 0;
         }
+        exit 0;
     }
     if($mode{u}) {
         @pkgs = aurcheck or

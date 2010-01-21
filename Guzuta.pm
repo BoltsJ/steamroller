@@ -34,9 +34,9 @@ sub getaurpkg ($) {
     my $aururl = "http://aur.archlinux.org/packages/$pkg/$pkg.tar.gz";
     our $tmpdir;
     mkdir $tmpdir;
+    print "Retreiving $_ sources from AUR...";
     my $resp = getstore($aururl, "$tmpdir/$pkg.tar.gz");
-#    system("/usr/bin/wget -O '$tmpdir/$pkg.tar.gz' -c '$aururl'") &&
-#    return 0;
+    print " done.\n";
     return 0 if is_error($resp);
     return "$tmpdir/$pkg.tar.gz";
 }
@@ -129,7 +129,7 @@ sub aursearch($) {
     my $json = get("$aurrpc?type=search&arg=$arg");
     my $data = decode_json $json;
     if($data->{results} eq "No results found") {
-        return 0;
+        return ();
     } else {
         return @{$data->{results}};
     }
