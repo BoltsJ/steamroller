@@ -18,28 +18,11 @@
 
 use strict;
 use warnings;
-use LWP::Simple qw(get getstore is_error);
-use JSON::XS qw(decode_json);
 require Exporter;
-our @EXPORT = qw(getaurpkg exttaurball finddeps makepkg repoadd pacsy aursearch aurcheck);
-our $VERSION = 0.01;
+our @EXPORT = qw(exttaurball finddeps makepkg repoadd pacsy);
 
 our %repo;
 our $tmpdir;
-
-our $aurrpc = "http://aur.archlinux.org/rpc.php";
-
-sub getaurpkg ($) {
-    my $pkg = shift;
-    my $aururl = "http://aur.archlinux.org/packages/$pkg/$pkg.tar.gz";
-    our $tmpdir;
-    mkdir $tmpdir;
-    print "Retreiving $_ sources from AUR...";
-    my $resp = getstore($aururl, "$tmpdir/$pkg.tar.gz");
-    print " done.\n";
-    return 0 if is_error($resp);
-    return "$tmpdir/$pkg.tar.gz";
-}
 
 sub exttaurball ($) {
     my $taurball = shift;
@@ -120,50 +103,6 @@ sub pacsy () {
         return 0;
     }
     return 1;
-}
-
-sub aursearch($) {
-    my @results;
-    our $aurrpc;
-    my $arg = shift;
-    return () unless $arg;
-    my $json = get("$aurrpc?type=search&arg=$arg");
-    my $data = decode_json $json;
-    if($data->{results} eq "No results found") {
-        return ();
-    } else {
-        return @{$data->{results}};
-    }
-}
-
-sub aurcheck () {
-    my @upgrades;
-    my $pkg;
-    my $pkgver;
-    my $pkginfo;
-    my $aurver;
-    my %repopkgs;
-    our $aurrpc;
-    our %repo;
-    opendir REPO, $repo{dir};
-    my @repofiles = readdir REPO;
-    closedir REPO;
-    chdir $repo{dir};
-    foreach(@repofiles) {
-        next unless /\.pkg\.tar\.gz$/;
-        $pkginfo = `/usr/bin/bsdtar -xOf $_ .PKGINFO`;
-        $pkginfo =~ /pkgver\s+=\s+(\S+)\n/;
-        $pkgver = $1;
-        $pkginfo =~ /pkgname\s+=\s+(\S+)\n/;
-        $pkg = $1;
-        $repopkgs{$pkg} = $pkgver;
-    }
-    foreach(sort keys %repopkgs) {
-        $aurver = get("$aurrpc?type=info&arg=$_");
-        $aurver =~ s/.*"Version":"(.+?)".*/$1/ || next;
-        push @upgrades, $_ if `/usr/bin/vercmp $aurver $repopkgs{$_}` == 1;
-    }
-    return @upgrades;
 }
 
 return 1;

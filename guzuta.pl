@@ -23,7 +23,8 @@
 
 use strict;
 use warnings;
-use Bolts::Guzuta;
+use Bolts::Guzuta::Makepkg;
+use Bolts::Guzuta::AUR;
 
 # Global declarations
 our %repo;
