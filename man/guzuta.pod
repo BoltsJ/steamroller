@@ -1,0 +1,59 @@
+=head1 NAME
+
+guzuta - An AUR helper that creates a local repo from which pacman installs packages.
+
+=head1 SYNOPSIS
+
+B<guzuta> S<-S package name ...>
+
+B<guzuta> S<-Su>
+
+B<guzuta> S<-Ss search term>
+
+B<guzuta> S<-U path/to/taurball.tar.gz>
+
+=head1 DESCRIPTION
+
+guzuta is an AUR helper that places built packages into a local repo where L<pacman(8)> can install from.
+
+=head1 OPTIONS
+
+=over 7
+
+=item -S, --sync
+
+Sychronise specified package list from AUR, resolving AUR dependencies, and add the built packages to the local repo.
+
+=item -u, --update
+
+When passed with \-S, check the AUR for updates to packages in the local repo and build 
+
+=item -s, --search
+
+When passed with \-S, perform a search of the AUR for the string provided.
+
+=item -U, --upgrade
+
+Build packages from specified taurballs and add them to the local repo.
+
+=back
+
+=head1 FILES
+
+=over 7
+
+=item F</etc/guzuta.conf>
+
+The system-wide configuration file.
+
+=back
+
+=head1 AUTHORS
+
+Joseph R. Nosie <bolts at archlinux dot us>
+
+=head1 SEE ALSO
+
+L<pacman(8)>,
+L<makepkg(8)>
+
