@@ -1,20 +1,20 @@
 =head1 NAME
 
-guzuta - An AUR helper that creates a local repo from which pacman installs packages.
+steamroller - An AUR helper that creates a local repo from which pacman installs packages.
 
 =head1 SYNOPSIS
 
-B<guzuta> S<-S package name ...>
+B<steamroller> S<-S package name ...>
 
-B<guzuta> S<-Su>
+B<steamroller> S<-Su>
 
-B<guzuta> S<-Ss search term>
+B<steamroller> S<-Ss search term>
 
-B<guzuta> S<-U path/to/taurball.tar.gz>
+B<steamroller> S<-U path/to/taurball.tar.gz>
 
 =head1 DESCRIPTION
 
-Guzuta is an AUR helper that places built packages into a local repo where L<pacman(8)> can install from.  Guzuta is designed to have similar syntax to pacman.
+Steamroller is an AUR helper that places built packages into a local repo where L<pacman(8)> can install from.  Steamroller is designed to have similar syntax to pacman.
 
 =head1 OPTIONS
 
@@ -42,11 +42,11 @@ Build packages from specified taurballs and add them to the local repo.
 
 =over 4
 
-=item F</etc/guzuta.conf>
+=item F</etc/steamroller.conf>
 
 The system-wide configuration file.
 
-=item F<~/.guzuta.conf>
+=item F<~/.steamroller.conf>
 
 Per-user configuration file.
 

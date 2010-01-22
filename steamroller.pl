@@ -19,16 +19,16 @@
 # METADATA
 # Version: 0.0.1
 
-# guzuta - A makepkg wrapper with AUR support
+# steamroller - A makepkg wrapper with AUR support
 
 use strict;
 use warnings;
-use Bolts::Guzuta::Makepkg;
-use Bolts::Guzuta::AUR;
+use Bolts::Steamroller::Makepkg;
+use Bolts::Steamroller::AUR;
 
 # Global declarations
 our %repo;
-our $tmpdir = '/tmp/guzuta';
+our $tmpdir = '/tmp/steamroller';
 our $col = 0;
 my @pkgs;
 my %mode;
@@ -44,7 +44,7 @@ our $pacmanbin = "/usr/bin/pacman";
 
 
 # Parse global config
-open CONF, "/etc/guzuta.conf" or
+open CONF, "/etc/steamroller.conf" or
 die "Failed to open global configuration file\n";
 while(<CONF>) {
     next if /^\s*#/;
@@ -72,9 +72,9 @@ while(<CONF>) {
         $pacmanbin = $1;
     }
 }
-if($uconf && stat("$ENV{HOME}/.guzuta.conf")) {
-    open CONF, "$ENV{HOME}/.guzuta.conf" or
-    die "Unable to read \$HOME/.guzuta.conf\n";
+if($uconf && stat("$ENV{HOME}/.steamroller.conf")) {
+    open CONF, "$ENV{HOME}/.steamroller.conf" or
+    die "Unable to read \$HOME/.steamroller.conf\n";
     while(<CONF>) {
         next if /^\s*#/;
         if(/^RepoName=(.+?)(\s+#|$)/) {
@@ -100,7 +100,7 @@ if($uconf && stat("$ENV{HOME}/.guzuta.conf")) {
 }
 close CONF;
 if(!$repo{name} && !$repo{dir}) {
-    die "RepoName and RepoDir must be set in /etc/guzuta.conf\n";
+    die "RepoName and RepoDir must be set in /etc/steamroller.conf\n";
 }
 
 
