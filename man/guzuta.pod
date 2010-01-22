@@ -14,7 +14,7 @@ B<guzuta> S<-U path/to/taurball.tar.gz>
 
 =head1 DESCRIPTION
 
-guzuta is an AUR helper that places built packages into a local repo where L<pacman(8)> can install from.
+Guzuta is an AUR helper that places built packages into a local repo where L<pacman(8)> can install from.  Guzuta is designed to have similar syntax to pacman.
 
 =head1 OPTIONS
 

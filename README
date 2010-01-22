@@ -23,9 +23,11 @@ INSTALLATION:
       Change any other settings (PacmanBin, RepoName, BuildDir) you desire.
     Edit /etc/pacman.conf and add the following, substituting guzuta.conf 
       variable names with their values:
+
 # Local guzuta repository
 [<RepoName>]
 Server = file://<RepoDir>
+
     Run `guzuta -S <pkgname>' to create the repo
     Run `pacman -Sy <pkgname>' to install the package.
 
