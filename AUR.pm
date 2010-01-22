@@ -20,34 +20,43 @@ use strict;
 use warnings;
 use LWP::Simple qw(get getstore is_error);
 use JSON::XS qw(decode_json);
+
 require Exporter;
 our @EXPORT = qw(getaurpkg aursearch aurcheck);
-
-our %repo;
-our $tmpdir;
 
 our $aurrpc = "http://aur.archlinux.org/rpc.php";
 
 sub getaurpkg ($) {
+    our $tmpdir;
+
     my $pkg = shift;
     my $aururl = "http://aur.archlinux.org/packages/$pkg/$pkg.tar.gz";
-    our $tmpdir;
+    my $resp;
+
     mkdir $tmpdir;
+
     print "Retreiving $_ sources from AUR...";
-    my $resp = getstore($aururl, "$tmpdir/$pkg.tar.gz");
+    $resp = getstore($aururl, "$tmpdir/$pkg.tar.gz");
     print " done.\n";
+
     return 0 if is_error($resp);
     return "$tmpdir/$pkg.tar.gz";
 }
 
-sub aursearch($) {
-    my @results;
+sub aursearch ($) {
     our $aurrpc;
+
     my $arg = shift;
+    my $json;
+
+    my @data;
+
     return () unless $arg;
-    my $json = get("$aurrpc?type=search&arg=$arg");
-    my $data = decode_json $json;
-    if($data->{results} eq "No results found") {
+
+    $json = get("$aurrpc?type=search&arg=$arg");
+    $data = decode_json $json;
+
+    if(scalar $data->{results} eq "No results found") {
         return ();
     } else {
         return @{$data->{results}};
@@ -55,27 +64,17 @@ sub aursearch($) {
 }
 
 sub aurcheck () {
-    my @upgrades;
-    my $pkg;
-    my $pkgver;
-    my $pkginfo;
-    my $aurver;
-    my %repopkgs;
     our $aurrpc;
     our %repo;
-    opendir REPO, $repo{dir};
-    my @repofiles = readdir REPO;
-    closedir REPO;
-    chdir $repo{dir};
-    foreach(@repofiles) {
-        next unless /\.pkg\.tar\.gz$/;
-        $pkginfo = `/usr/bin/bsdtar -xOf $_ .PKGINFO`;
-        $pkginfo =~ /pkgver\s+=\s+(\S+)\n/;
-        $pkgver = $1;
-        $pkginfo =~ /pkgname\s+=\s+(\S+)\n/;
-        $pkg = $1;
-        $repopkgs{$pkg} = $pkgver;
-    }
+
+    my $aurver;
+    my %repopkgs;
+
+    my @upgrades;
+
+    %repopkgs = `/usr/bin/bsdtar -tf $repo{dir}/$repo{name}.db.tar.gz` =~
+        m/(.+)-(\d.*-\d+)$/g;
+
     foreach(sort keys %repopkgs) {
         $aurver = get("$aurrpc?type=info&arg=$_");
         $aurver =~ s/.*"Version":"(.+?)".*/$1/ || next;

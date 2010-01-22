@@ -58,6 +58,7 @@ while(<CONF>) {
     }
     if(/^Colour=yes/ && -t STDOUT) {
         $col = 1;
+        next;
     }
     if(/^BuildDir=(.+?)(\s+#|$)/) {
         $tmpdir = $1;
@@ -69,6 +70,32 @@ while(<CONF>) {
     }
     if(/^PacmanBin=(.+?)(\s+#|$)/) {
         $pacmanbin = $1;
+    }
+}
+if($uconf && stat("$ENV{HOME}/.guzuta.conf")) {
+    open CONF, "$ENV{HOME}/.guzuta.conf" or
+    die "Unable to read \$HOME/.guzuta.conf\n";
+    while(<CONF>) {
+        next if /^\s*#/;
+        if(/^RepoName=(.+?)(\s+#|$)/) {
+            $repo{name} = $1;
+            next;
+        }
+        if(/^RepoDir=(.+?)(\s+#|$)/) {
+            $repo{dir} = $1;
+            next;
+        }
+        if(/^Colour=yes/ && -t STDOUT) {
+            $col = 1;
+            next;
+        }
+        if(/^BuildDir=(.+?)(\s+#|$)/) {
+            $tmpdir = $1;
+            next;
+        }
+        if(/^PacmanBin=(.+?)(\s+#|$)/) {
+            $pacmanbin = $1;
+        }
     }
 }
 close CONF;

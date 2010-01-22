@@ -21,12 +21,11 @@ use warnings;
 require Exporter;
 our @EXPORT = qw(exttaurball finddeps makepkg repoadd pacsy);
 
-our %repo;
-our $tmpdir;
-
 sub exttaurball ($) {
-    my $taurball = shift;
     our $tmpdir;
+
+    my $taurball = shift;
+
     chdir $tmpdir;
     system("/usr/bin/bsdtar -xf $taurball.tar.gz") &&
     return 0;
@@ -34,12 +33,15 @@ sub exttaurball ($) {
 }
 
 sub finddeps ($) {
-    my $pkg = shift;
     our $tmpdir;
     our $paclst;
+
+    my $pkg = shift;
     my $pkgbuild = `bsdtar -xOf $tmpdir/$pkg.tar.gz $pkg/PKGBUILD`;
     my $deps;
+
     my @deplist;
+
     if($pkgbuild =~ /\ndepends=\(([^)]+)\)/) {
         $deps = $1;
         while($deps =~ s/'([^ ']+)'//) {
@@ -60,41 +62,56 @@ sub finddeps ($) {
 }
 
 sub makepkg ($) {
-    my $pkg = shift;
-    my $pkgf;
     our $editor;
+    our $tmpdir;
+
+    my $pkg = shift;
+    my @sources;
+
+    my $pkgf;
+
     opendir BUILDDIR, "$tmpdir/$pkg";
-    my @sources = readdir BUILDDIR;
+    @sources = readdir BUILDDIR;
     closedir BUILDDIR;
+
     chdir("$tmpdir/$pkg");
     foreach my $source (@sources) {
         system("$editor $source") if $source =~ /^(PKGBUILD|.+\.install)$/i;
     }
+
     system("/usr/bin/makepkg -s") && 
     return 0;
+
     opendir BUILDDIR, ".";
     @sources = readdir BUILDDIR;
     closedir BUILDDIR;
+
     foreach(@sources) {
         $pkgf = $_ if /$pkg-.+-.+-.+\.pkg\.tar\.gz/;
     }
-    system("cp $pkgf ../");
-    chdir('..');
+    system("cp $pkgf $tmpdir");
+    chdir($tmpdir);
+
     return $pkgf;
 }
 
 sub repoadd ($) {
-    my $pkgf = pop;
     our %repo;
+
+    my $pkgf = pop;
+
     system("mv $tmpdir/$pkgf $repo{dir}") &&
     return 0;
+
     system("/usr/bin/repo-add $repo{dir}/$repo{name}.db.tar.gz $repo{dir}/$pkgf") &&
     return 0;
+
     return 1;
 }
 
 sub pacsy () {
     our $pacmanbin;
+
     if(stat "/usr/bin/sudo") {
         system("/usr/bin/sudo $pacmanbin -Sy") &&
         return 0;

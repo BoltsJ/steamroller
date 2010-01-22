@@ -18,7 +18,7 @@ guzuta is an AUR helper that places built packages into a local repo where L<pac
 
 =head1 OPTIONS
 
-=over 7
+=over 4
 
 =item -S, --sync
 
@@ -40,11 +40,15 @@ Build packages from specified taurballs and add them to the local repo.
 
 =head1 FILES
 
-=over 7
+=over 4
 
 =item F</etc/guzuta.conf>
 
 The system-wide configuration file.
+
+=item F<~/.guzuta.conf>
+
+Per-user configuration file.
 
 =back
 

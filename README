@@ -13,7 +13,8 @@ INSTALLATION:
   Files:
     guzuta.conf -> /etc/
     guzuta.pl   -> ${PATH}/guzuta and make executable
-    Guzuta.pm   -> /usr/share/perl5/vendor_perl/Bolts/
+    AUR.pm      -> /usr/share/perl5/vendor_perl/Bolts/Guzuta
+    Makepkg.pm  -> /usr/share/perl5/vendor_perl/Bolts/Guzuta
   Setup:
     Create a directory to contain the repo.  It must be writable to the user(s)
       allowed to modify the repo.  $HOME/pkgs is a good choice for a single
