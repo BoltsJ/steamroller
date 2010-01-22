@@ -49,7 +49,7 @@ sub aursearch ($) {
     my $arg = shift;
     my $json;
 
-    my @data;
+    my $data;
 
     return () unless $arg;
 
@@ -73,8 +73,9 @@ sub aurcheck () {
     my @upgrades;
 
     %repopkgs = `/usr/bin/bsdtar -tf $repo{dir}/$repo{name}.db.tar.gz` =~
-        m/(.+)-(\d.*-\d+)$/g;
+        m#(.+)-(\d.*-\d+)/#g;
 
+    print "Checking for updates...\n";
     foreach(sort keys %repopkgs) {
         $aurver = get("$aurrpc?type=info&arg=$_");
         $aurver =~ s/.*"Version":"(.+?)".*/$1/ || next;

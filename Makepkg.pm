@@ -97,6 +97,7 @@ sub makepkg ($) {
 
 sub repoadd ($) {
     our %repo;
+    our $tmpdir;
 
     my $pkgf = pop;
 
