@@ -110,10 +110,13 @@ while($_ = shift) {
         $mode{S} = 1 if /S/;
         $mode{U} = 1 if /U/;
         $mode{s} = 1 if /s/;
+        $mode{i} = 1 if /i/;
         $mode{u} = 1 if /u/;
     }
     $mode{S} = 1 if /^--sync$/;
+    $mode{U} = 1 if /^--upgrade$/;
     $mode{s} = 1 if /^--search$/;
+    $mode{i} = 1 if /^--info$/;
     $mode{u} = 1 if /^--update$/;
     push @pkgs, $_ if /^[^-]/;
 }
@@ -128,6 +131,39 @@ if($col) {
 }
 
 if($mode{S}) {
+    if($mode{i}) {
+        die "$err No packages specified\n" unless @pkgs;
+        my %pkginf;
+        my @fmt;
+        if($col) {
+            @fmt = (
+                "\e[0;1m", "\e[35;1m",
+                "\e[0;1m", "\e[0;1m",
+                "\e[0;1m", "\e[32;1m",
+                "\e[0;1m", "\e[36;1m",
+                "\e[0;1m", "\e[0m",
+                "\e[0;1m", "\e[0m",
+            );
+        } else {
+            @fmt = ('','','','','','','','','','','','');
+        }
+        foreach(@pkgs) {
+            %pkginf = aurinfo $_;
+
+            die "$err $_ not found in AUR\n" unless scalar %pkginf;
+
+            printf <<EOI, @fmt;
+%sRepository    : %sAUR
+%sName          : %s$pkginf{Name}
+%sVersion       : %s$pkginf{Version}
+%sURL           : %s$pkginf{URL}
+%sLicenses      : %s$pkginf{License}
+%sDescription   : %s$pkginf{Description}
+EOI
+
+        }
+        exit 0;
+    }
     if($mode{s}) {
         die "$err No search string specified\n" unless @pkgs;
         my @results = aursearch join '+', @pkgs;

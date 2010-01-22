@@ -22,7 +22,7 @@ use LWP::Simple qw(get getstore is_error);
 use JSON qw(decode_json);
 
 require Exporter;
-our @EXPORT = qw(getaurpkg aursearch aurcheck);
+our @EXPORT = qw(getaurpkg aursearch aurinfo aurcheck);
 
 our $aurrpc = "http://aur.archlinux.org/rpc.php";
 
@@ -56,12 +56,33 @@ sub aursearch ($) {
     $json = get("$aurrpc?type=search&arg=$arg");
     $data = decode_json $json;
 
-    if(scalar $data->{results} eq "No results found") {
+    if($data->{type} eq 'error') {
         return ();
     } else {
         return @{$data->{results}};
     }
 }
+
+sub aurinfo ($) {
+    our $aurrpc;
+
+    my $arg = shift;
+    my $json;
+
+    my $data;
+
+    return () unless $arg;
+
+    $json = get "$aurrpc?type=info&arg=$arg";
+    $data = decode_json $json;
+
+    if($data->{type} eq 'error') {
+        return ();
+    } else {
+        return %{$data->{results}};
+    }
+}
+
 
 sub aurcheck () {
     our $aurrpc;

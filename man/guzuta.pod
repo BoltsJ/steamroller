@@ -8,13 +8,15 @@ B<guzuta> S<-S package name ...>
 
 B<guzuta> S<-Su>
 
+B<guzuta> S<-Si package name>
+
 B<guzuta> S<-Ss search term>
 
 B<guzuta> S<-U path/to/taurball.tar.gz>
 
 =head1 DESCRIPTION
 
-guzuta is an AUR helper that places built packages into a local repo where L<pacman(8)> can install from.
+Guzuta is an AUR helper that places built packages into a local repo where L<pacman(8)> can install from.  Guzuta is designed to have similar syntax to pacman.
 
 =head1 OPTIONS
 
@@ -26,11 +28,15 @@ Sychronise specified package list from AUR, resolving AUR dependencies, and add 
 
 =item -u, --update
 
-When passed with \-S, check the AUR for updates to packages in the local repo and build 
+When passed with -S, check the AUR for updates to packages in the local repo and build 
+
+=item -i, --info
+
+When passed with -S, display info about an AUR package.
 
 =item -s, --search
 
-When passed with \-S, perform a search of the AUR for the string provided.
+When passed with -S, perform a search of the AUR for the string provided.
 
 =item -U, --upgrade
 
