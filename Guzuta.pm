@@ -126,6 +126,7 @@ sub aursearch($) {
     my @results;
     our $aurrpc;
     my $arg = shift;
+    return () unless $arg;
     my $json = get("$aurrpc?type=search&arg=$arg");
     my $data = decode_json $json;
     if($data->{results} eq "No results found") {

@@ -83,7 +83,6 @@ while($_ = shift) {
         $mode{U} = 1 if /U/;
         $mode{s} = 1 if /s/;
         $mode{u} = 1 if /u/;
-        $mode{y} = 1 if /y/;
     }
     $mode{S} = 1 if /^--sync$/;
     $mode{s} = 1 if /^--search$/;
@@ -93,9 +92,16 @@ while($_ = shift) {
 
 
 # main()
+if($col) {
+    $err = "\e[31;1mERROR:\e[0m";
+} else {
+    $err = "ERROR:";
+}
+
 if($mode{S}) {
     if($mode{s}) {
-        my @results = aursearch $pkgs[0];
+        die "$err No search string specified\n" unless @pkgs;
+        my @results = aursearch join '+', @pkgs;
         if(!@results) {
             print "No results found\n";
             exit 1;
@@ -119,7 +125,7 @@ if($mode{S}) {
     my @deplist;
     foreach(@pkgs) { # Generate list of AUR dependencies
         getaurpkg $_ ||
-        die "$_ not found on the AUR\n";
+        die "$err $_ not found on the AUR\n";
         push @deplist, finddeps $_;
     }
 #       Prepend each AUR dependency to the list of pkgs to add to the repo
@@ -127,7 +133,7 @@ if($mode{S}) {
     while($_ = pop @deplist) {
         unshift @pkgs, $_;
         getaurpkg $_ ||
-        die "$_ not found on the AUR\n";
+        die "$err $_ not found on the AUR\n";
         unshift @deplist, finddeps $_;
     }
 
@@ -147,11 +153,11 @@ if($mode{S}) {
     # build packages in order
     foreach(@bpkgs) {
         exttaurball $_ ||
-        die "Could not extract $tmpdir/$_.tar.gz";
+        die "$err Could not extract $tmpdir/$_.tar.gz";
         my $pkgf = makepkg $_ ||
-        die "Build of $_ failed.\n";
+        die "$err Build of $_ failed.\n";
         repoadd $pkgf ||
-        die "Failed to add $_ to local repo `$repo{name}'\n";
+        die "$err Failed to add $_ to local repo `$repo{name}'\n";
         pacsy; # Update pacman repos for build dep resolution.
     }
     exit 0;
@@ -168,11 +174,13 @@ if($mode{U}) {
         system("cp $_ $tmpdir/$upkg.tar.gz");
     }
     foreach(@upkgs) {
-        exttaurball $_;
-        my $pkgf = makepkg $_;
-        repoadd $pkgf;
+        exttaurball $_ ||
+        die "$err Could not extract $tmpdir/$_.tar.gz";
+        my $pkgf = makepkg $_ ||
+        die "$err Build of $_ failed.\n";
+        repoadd $pkgf ||
+        die "$err Failed to add $_ to local repo `$repo{name}'\n";
     }
-    pacsy if $mode{y};
     exit 0;
 }
 
