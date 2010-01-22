@@ -19,7 +19,7 @@
 use strict;
 use warnings;
 use LWP::Simple qw(get getstore is_error);
-use JSON::XS qw(decode_json);
+use JSON qw(decode_json);
 
 require Exporter;
 our @EXPORT = qw(getaurpkg aursearch aurcheck);

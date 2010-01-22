@@ -79,7 +79,7 @@ sub makepkg ($) {
         system("$editor $source") if $source =~ /^(PKGBUILD|.+\.install)$/i;
     }
 
-    system("/usr/bin/makepkg -s") && 
+    system("/usr/bin/makepkg -sf") && 
     return 0;
 
     opendir BUILDDIR, ".";
