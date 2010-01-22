@@ -92,6 +92,7 @@ while($_ = shift) {
 
 
 # main()
+my $err;
 if($col) {
     $err = "\e[31;1mERROR:\e[0m";
 } else {
