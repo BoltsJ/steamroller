@@ -1,7 +1,6 @@
-  .---.
- | ^_^ | Guzuta: An AUR helper that creates a local repo 
- |     |   from which pacman installs packages.
- |.-.-.|   
+Steamroller: An AUR helper that creates a local repo 
+  from which pacman installs packages.
+  
 
 INSTALLATION:
   Dependencies:
@@ -11,22 +10,22 @@ INSTALLATION:
     pacman
     sudo (optional)
   Files:
-    guzuta.conf -> /etc/
-    guzuta.pl   -> ${PATH}/guzuta and make executable
-    AUR.pm      -> /usr/share/perl5/vendor_perl/Bolts/Guzuta
-    Makepkg.pm  -> /usr/share/perl5/vendor_perl/Bolts/Guzuta
+    steamroller.conf -> /etc/
+    steamroller.pl   -> ${PATH}/steamroller and make executable
+    AUR.pm      -> /usr/share/perl5/vendor_perl/Bolts/Steamroller
+    Makepkg.pm  -> /usr/share/perl5/vendor_perl/Bolts/Steamroller
   Setup:
     Create a directory to contain the repo.  It must be writable to the user(s)
       allowed to modify the repo.  $HOME/pkgs is a good choice for a single
       user system.
-    Edit /etc/guzuta.conf to point to the directory containing the repo.  
+    Edit /etc/steamroller.conf to point to the directory containing the repo.  
       Change any other settings (PacmanBin, RepoName, BuildDir) you desire.
-    Edit /etc/pacman.conf and add the following, substituting guzuta.conf 
+    Edit /etc/pacman.conf and add the following, substituting steamroller.conf 
       variable names with their values:
-# Local guzuta repository
+# Local steamroller repository
 [<RepoName>]
 Server = file://<RepoDir>
-    Run `guzuta -S <pkgname>' to create the repo
+    Run `steamroller -S <pkgname>' to create the repo
     Run `pacman -Sy <pkgname>' to install the package.
 
 OPTIONS:
