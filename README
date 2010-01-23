@@ -1,11 +1,11 @@
 Steamroller: An AUR helper that creates a local repo 
   from which pacman installs packages.
-
+  
 INSTALLATION:
   Dependencies:
     Perl
     LWP::Simple (perl-libwww)
-    JSON::XS (perl-json-xs)
+    JSON (perl-json)
     pacman
     sudo (optional)
   Files:
@@ -38,5 +38,6 @@ OPTIONS:
   Sync Options:
     -u, --update : Check AUR for updates to packages, and build and add to
         any updates found.
+    -i, --info : Get package information from AUR
     -s, --search : Search AUR for string specified.
 

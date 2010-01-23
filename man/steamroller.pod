@@ -8,6 +8,8 @@ B<steamroller> S<-S package name ...>
 
 B<steamroller> S<-Su>
 
+B<steamroller> S<-Si package name>
+
 B<steamroller> S<-Ss search term>
 
 B<steamroller> S<-U path/to/taurball.tar.gz>
@@ -26,11 +28,15 @@ Sychronise specified package list from AUR, resolving AUR dependencies, and add 
 
 =item -u, --update
 
-When passed with \-S, check the AUR for updates to packages in the local repo and build 
+When passed with -S, check the AUR for updates to packages in the local repo and build 
+
+=item -i, --info
+
+When passed with -S, display info about an AUR package.
 
 =item -s, --search
 
-When passed with \-S, perform a search of the AUR for the string provided.
+When passed with -S, perform a search of the AUR for the string provided.
 
 =item -U, --upgrade
 
