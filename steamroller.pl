@@ -141,7 +141,7 @@ if($mode{S}) {
                 "\e[0;1m", "\e[36;1m",
                 "\e[0;1m", "\e[0m",
             );
-            push @fmt, @fmt[8,9] x 7;
+            push @fmt, (@fmt[8,9]) x 7;
         } else {
             @fmt = ('') x 24;
         }
