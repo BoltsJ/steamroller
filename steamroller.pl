@@ -108,12 +108,14 @@ while($_ = shift) {
         $mode{s} = 1 if /s/;
         $mode{i} = 1 if /i/;
         $mode{u} = 1 if /u/;
+        $mode{q} = 1 if /q/;
     }
     $mode{S} = 1 if /^--sync$/;
     $mode{U} = 1 if /^--upgrade$/;
     $mode{s} = 1 if /^--search$/;
     $mode{i} = 1 if /^--info$/;
     $mode{u} = 1 if /^--update$/;
+    $mode{q} = 1 if /^--quiet$/;
     push @pkgs, $_ if /^[^-]/;
 }
 
@@ -138,25 +140,31 @@ if($mode{S}) {
                 "\e[0;1m", "\e[32;1m",
                 "\e[0;1m", "\e[36;1m",
                 "\e[0;1m", "\e[0m",
-                "\e[0;1m", "\e[0m",
             );
+            push @fmt, @fmt[8,9] x 7;
         } else {
-            @fmt = ('','','','','','','','','','','','');
+            @fmt = ('') x 24;
         }
+
         foreach(@pkgs) {
             %pkginf = aurinfo $_;
 
             die "$err $_ not found in AUR\n" unless scalar %pkginf;
-
             printf <<EOI, @fmt;
-%sRepository    : %sAUR
-%sName          : %s$pkginf{Name}
-%sVersion       : %s$pkginf{Version}
-%sURL           : %s$pkginf{URL}
-%sLicenses      : %s$pkginf{License}
-%sDescription   : %s$pkginf{Description}
-EOI
+%sRepository      : %sAUR
+%sName            : %s$pkginf{pkgname}
+%sVersion         : %s$pkginf{pkgver}-$pkginf{pkgrel}
+%sURL             : %s$pkginf{url}
+%sLicenses        : %s$pkginf{license}
+%sGroups          : %s$pkginf{groups}
+%sProvides        : %s$pkginf{provides}
+%sDepends On      : %s$pkginf{depends}
+%sOptional Deps   : %s$pkginf{optdepends}
+%sConflicts With  : %s$pkginf{conflicts}
+%sReplaces        : %s$pkginf{replaces}
+%sDescription     : %s$pkginf{pkgdesc}
 
+EOI
         }
         exit 0;
     }
@@ -167,12 +175,18 @@ EOI
             print "No results found\n";
             exit 1;
         }
-        foreach(@results) {
-            printf "%sAUR/%s$_->{Name} %s$_->{Version}%s\n    $_->{Description}\n",
-            $col ? "\e[35;1m" : "",
-            $col ? "\e[0;1m"  : "",
-            $col ? "\e[32;1m" : "",
-            $col ? "\e[0m"    : "";
+        if($mode{q}) {
+            foreach(@results) {
+                print "$_->{Name}\n"
+            }
+        } else {
+            foreach(@results) {
+                printf "%sAUR/%s$_->{Name} %s$_->{Version}%s\n    $_->{Description}\n",
+                $col ? "\e[35;1m" : "",
+                $col ? "\e[0;1m"  : "",
+                $col ? "\e[32;1m" : "",
+                $col ? "\e[0m"    : "";
+            }
         }
         exit 0;
     }
