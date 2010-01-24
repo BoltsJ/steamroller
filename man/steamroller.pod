@@ -24,7 +24,7 @@ Steamroller is an AUR helper that places built packages into a local repo where 
 
 =item -S, --sync
 
-Sychronise specified package list from AUR, resolving AUR dependencies, and add the built packages to the local repo.
+Synchronise specified package list from AUR, resolving AUR dependencies, and add the built packages to the local repo.
 
 =item -u, --update
 
@@ -41,6 +41,10 @@ When passed with -S, perform a search of the AUR for the string provided.
 =item -U, --upgrade
 
 Build packages from specified taurballs and add them to the local repo.
+
+=item -q, --quiet
+
+Suppress some messages during operation.
 
 =back
 
