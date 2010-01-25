@@ -122,10 +122,13 @@ while($_ = shift) {
 
 # main()
 my $err;
+my $msg;
 if($col) {
-    $err = "\e[31;1mERROR:\e[0m";
+    $err = "\e[31;1m==> ERROR:\e[0m";
+    $msg = "\e[32;1m==>\e[0m";
 } else {
-    $err = "ERROR:";
+    $err = "==> ERROR:";
+    $msg = "==>";
 }
 
 if($mode{S}) {
@@ -145,7 +148,6 @@ if($mode{S}) {
         } else {
             @fmt = ('') x 24;
         }
-
         foreach(@pkgs) {
             %pkginf = aurinfo $_;
 
@@ -172,7 +174,7 @@ EOI
         die "$err No search string specified\n" unless @pkgs;
         my @results = aursearch join '+', @pkgs;
         if(!@results) {
-            print "No results found\n";
+            print "$msg No results found\n";
             exit 1;
         }
         if($mode{q}) {
@@ -192,12 +194,13 @@ EOI
     }
     if($mode{u}) {
         @pkgs = aurcheck or
-        print "Local repo is up to date with AUR\n";
+        print "$msg Local repo is up to date with AUR\n";
     }
     exit 0 unless @pkgs;
     our $paclst = `$pacmanbin -Sqs`;
     # Match with $paclst =~ m/^<pattern>$/m
     my @deplist;
+    print "$msg Retreiving sources from AUR...\n";
     foreach(@pkgs) { # Generate list of AUR dependencies
         getaurpkg $_ ||
         die "$err $_ not found on the AUR\n";
@@ -221,7 +224,7 @@ EOI
         push @bpkgs, $i;
     }
 
-    print "Targets: @bpkgs\nProceed with build? [Y/n] ";
+    printf "Targets(%s): @bpkgs\nProceed with build? [Y/n] ", scalar @bpkgs;
     if(<STDIN> =~ /no?/i) {
         exit 0;
     }
