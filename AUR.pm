@@ -10,19 +10,11 @@ our $aurrpc = "http://aur.archlinux.org/rpc.php";
 
 sub getaurpkg ($) {
     our $tmpdir;
-    our $col;
+    our $inf;
 
     my $pkg = shift;
     my $aururl = "http://aur.archlinux.org/packages/$pkg/$pkg.tar.gz";
     my $resp;
-    my $inf;
-
-    if($col) {
-        $inf = "\e[34;1m  ->\e[0m";
-    } else {
-        $inf = "  ->";
-    }
-
 
     mkdir $tmpdir;
 
@@ -84,7 +76,7 @@ sub aurinfo ($) {
 sub aurcheck () {
     our $aurrpc;
     our %repo;
-    our $col;
+    our $msg;
 
     my $aurver;
     my %repopkgs;
@@ -92,18 +84,13 @@ sub aurcheck () {
 
     my @upgrades;
 
-    if($col) {
-        $msg = "\e[32;1m==>\e[0m";
-    } else {
-        $msg = "==>";
-    }
-
     %repopkgs = `/usr/bin/bsdtar -tf $repo{dir}/$repo{name}.db.tar.gz` =~
         m#(.+)-(\d.*-\d+)/#g;
 
     print "$msg Checking for updates...\n";
     foreach(sort keys %repopkgs) {
-        $aurver = get("$aurrpc?type=info&arg=$_");
+        $aurver = get("$aurrpc?type=info&arg=$_") ||
+        return 0;
         $aurver =~ s/.*"Version":"(.+?)".*/$1/ || next;
         push @upgrades, $_ if `/usr/bin/vercmp $aurver $repopkgs{$_}` == 1;
     }

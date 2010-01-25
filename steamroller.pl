@@ -26,6 +26,10 @@ use Bolts::Steamroller::AUR;
 our %repo;
 our $tmpdir = '/tmp/steamroller';
 our $col = 0;
+our $msg = "==>";
+our $inf = "  ->";
+our $err = "==> ERROR:";
+
 my @pkgs;
 my %mode;
 
@@ -125,10 +129,8 @@ my $err;
 my $msg;
 if($col) {
     $err = "\e[31;1m==> ERROR:\e[0m";
+    $inf = "\e[34;1m  ->\e[0m";
     $msg = "\e[32;1m==>\e[0m";
-} else {
-    $err = "==> ERROR:";
-    $msg = "==>";
 }
 
 if($mode{S}) {
