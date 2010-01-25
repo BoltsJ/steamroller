@@ -10,6 +10,7 @@ our $aurrpc = "http://aur.archlinux.org/rpc.php";
 
 sub getaurpkg ($) {
     our $tmpdir;
+    our $inf;
 
     my $pkg = shift;
     my $aururl = "http://aur.archlinux.org/packages/$pkg/$pkg.tar.gz";
@@ -17,7 +18,7 @@ sub getaurpkg ($) {
 
     mkdir $tmpdir;
 
-    print "Retreiving $_ sources from AUR...";
+    print "$inf $_...";
     $resp = getstore($aururl, "$tmpdir/$pkg.tar.gz");
     print " done.\n";
 
@@ -32,6 +33,8 @@ sub aursearch ($) {
     my $json;
 
     my $data;
+
+
 
     return () unless $arg;
 
@@ -73,6 +76,7 @@ sub aurinfo ($) {
 sub aurcheck () {
     our $aurrpc;
     our %repo;
+    our $msg;
 
     my $aurver;
     my %repopkgs;
@@ -82,9 +86,10 @@ sub aurcheck () {
     %repopkgs = `/usr/bin/bsdtar -tf $repo{dir}/$repo{name}.db.tar.gz` =~
         m#(.+)-(\d.*-\d+)/#g;
 
-    print "Checking for updates...\n";
+    print "$msg Checking for updates...\n";
     foreach(sort keys %repopkgs) {
-        $aurver = get("$aurrpc?type=info&arg=$_");
+        $aurver = get("$aurrpc?type=info&arg=$_") ||
+        return 0;
         $aurver =~ s/.*"Version":"(.+?)".*/$1/ || next;
         push @upgrades, $_ if `/usr/bin/vercmp $aurver $repopkgs{$_}` == 1;
     }
