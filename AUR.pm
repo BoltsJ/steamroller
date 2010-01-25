@@ -80,7 +80,6 @@ sub aurcheck () {
 
     my $aurver;
     my %repopkgs;
-    my $msg;
 
     my @upgrades;
 

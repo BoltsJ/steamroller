@@ -125,8 +125,6 @@ while($_ = shift) {
 
 
 # main()
-my $err;
-my $msg;
 if($col) {
     $err = "\e[31;1m==> ERROR:\e[0m";
     $inf = "\e[34;1m  ->\e[0m";
