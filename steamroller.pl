@@ -208,6 +208,7 @@ EOI
     }
 #       Prepend each AUR dependency to the list of pkgs to add to the repo
 #       then check its dependencies
+    print "$msg Resolving dependencies...\n";
     while($_ = pop @deplist) {
         unshift @pkgs, $_;
         getaurpkg $_ ||
