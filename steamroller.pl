@@ -201,7 +201,8 @@ EOI
     print "$msg Retreiving sources from AUR...\n";
     foreach(@pkgs) { # Generate list of AUR dependencies
         getaurpkg $_ ||
-        die "$err $_ not found on the AUR\n";
+        warn "$err $_ not found on the AUR\n" &&
+        next;
         push @deplist, finddeps $_;
     }
 #       Prepend each AUR dependency to the list of pkgs to add to the repo
@@ -210,7 +211,7 @@ EOI
     while($_ = pop @deplist) {
         unshift @pkgs, $_;
         getaurpkg $_ ||
-        die "$err $_ not found on the AUR\n";
+        die "$err $_ not found in sync database or on AUR\n";
         unshift @deplist, finddeps $_;
     }
 

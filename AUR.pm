@@ -20,10 +20,13 @@ sub getaurpkg ($) {
 
     print "$inf $_...";
     $resp = getstore($aururl, "$tmpdir/$pkg.tar.gz");
-    print " done.\n";
-
-    return 0 if is_error($resp);
-    return "$tmpdir/$pkg.tar.gz";
+    if(is_error($resp)) {
+        print "failed.\n";
+        return 0;
+    } else {
+        print " done.\n";
+        return "$tmpdir/$pkg.tar.gz";
+    }
 }
 
 sub aursearch ($) {
