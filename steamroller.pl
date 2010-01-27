@@ -198,18 +198,23 @@ EOI
     our $paclst = `$pacmanbin -Sqs`;
     # Match with $paclst =~ m/^<pattern>$/m
     my @deplist;
+    my @apkgs = ();
     print "$msg Retreiving sources from AUR...\n";
     foreach(@pkgs) { # Generate list of AUR dependencies
         getaurpkg $_ ||
         warn "$err $_ not found on the AUR\n" &&
         next;
         push @deplist, finddeps $_;
+        push @apkgs, $_;
+    }
+    if(!@apkgs) {
+        die "$err No targets\n";
     }
 #       Prepend each AUR dependency to the list of pkgs to add to the repo
 #       then check its dependencies
     print "$msg Resolving dependencies...\n";
     while($_ = pop @deplist) {
-        unshift @pkgs, $_;
+        unshift @apkgs, $_;
         getaurpkg $_ ||
         die "$err $_ not found in sync database or on AUR\n";
         unshift @deplist, finddeps $_;
@@ -217,7 +222,7 @@ EOI
 
     # Remove duplicate entries from package list
     my @bpkgs = ();
-    PKG: foreach my $i (@pkgs) {
+    PKG: foreach my $i (@apkgs) {
         foreach my $j (@bpkgs) {
             next PKG if $i eq $j;
         }
@@ -231,7 +236,7 @@ EOI
     # build packages in order
     foreach(@bpkgs) {
         exttaurball $_ ||
-        die "$err Could not extract $tmpdir/$_.tar.gz";
+        die "$err Could not extract $tmpdir/$_.tar.gz\n";
         my $pkgf = makepkg $_ ||
         die "$err Build of $_ failed.\n";
         repoadd $pkgf ||
