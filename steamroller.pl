@@ -29,6 +29,7 @@ our $col = 0;
 our $msg = "==>";
 our $inf = "  ->";
 our $err = "==> ERROR:";
+our $makepkgopt = '';
 
 my @pkgs;
 my %mode;
@@ -48,28 +49,26 @@ open CONF, "/etc/steamroller.conf" or
 die "Failed to open global configuration file\n";
 while(<CONF>) {
     next if /^\s*#/;
-    if(/^RepoName=(.+?)(\s+#|$)/) {
+    if(/^RepoName=(.+?)\s*(?:#|$)/) {
         $repo{name} = $1;
-        next;
     }
-    if(/^RepoDir=(.+?)(\s+#|$)/) {
+    if(/^RepoDir=(.+?)\s*(?:#|$)/) {
         $repo{dir} = $1;
-        next;
     }
     if(/^Colour=yes/ && -t STDOUT) {
         $col = 1;
-        next;
     }
-    if(/^BuildDir=(.+?)(\s+#|$)/) {
+    if(/^BuildDir=(.+?)\s*(?:#|$)/) {
         $tmpdir = $1;
-        next;
     }
     if(/^UserConfig=no/) {
         $uconf = 0;
-        next;
     }
-    if(/^PacmanBin=(.+?)(\s+#|$)/) {
+    if(/^PacmanBin=(.+?)\s*(?:#|$)/) {
         $pacmanbin = $1;
+    }
+    if(/^MakepkgOpts='(.+?)'\s*(?:#|$)/) {
+        $makepkgopt = $1;
     }
 }
 if($uconf && stat("$ENV{HOME}/.steamroller.conf")) {
@@ -79,22 +78,21 @@ if($uconf && stat("$ENV{HOME}/.steamroller.conf")) {
         next if /^\s*#/;
         if(/^RepoName=(.+?)(\s+#|$)/) {
             $repo{name} = $1;
-            next;
         }
         if(/^RepoDir=(.+?)(\s+#|$)/) {
             $repo{dir} = $1;
-            next;
         }
         if(/^Colour=yes/ && -t STDOUT) {
             $col = 1;
-            next;
         }
         if(/^BuildDir=(.+?)(\s+#|$)/) {
             $tmpdir = $1;
-            next;
         }
         if(/^PacmanBin=(.+?)(\s+#|$)/) {
             $pacmanbin = $1;
+        }
+        if(/^MakepkgOpts='(.+?)'\s*(?:#|$)/) {
+            $makepkgopt = $1;
         }
     }
 }
@@ -208,6 +206,7 @@ EOI
     }
 #       Prepend each AUR dependency to the list of pkgs to add to the repo
 #       then check its dependencies
+    print "$msg Resolving dependencies...\n";
     while($_ = pop @deplist) {
         unshift @pkgs, $_;
         getaurpkg $_ ||
