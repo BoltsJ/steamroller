@@ -46,6 +46,7 @@ sub finddeps ($) {
 sub makepkg ($) {
     our $editor;
     our $tmpdir;
+    our $makepkgopt;
 
     my $pkg = shift;
     my @sources;
@@ -61,7 +62,7 @@ sub makepkg ($) {
         system("$editor $source") if $source =~ /^(PKGBUILD|.+\.install)$/i;
     }
 
-    system("/usr/bin/makepkg -sf") && 
+    system("/usr/bin/makepkg -sf $makepkgopt") && 
     return 0;
 
     opendir BUILDDIR, ".";

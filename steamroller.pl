@@ -29,6 +29,7 @@ our $col = 0;
 our $msg = "==>";
 our $inf = "  ->";
 our $err = "==> ERROR:";
+our $makepkgopt = '';
 
 my @pkgs;
 my %mode;
@@ -48,28 +49,26 @@ open CONF, "/etc/steamroller.conf" or
 die "Failed to open global configuration file\n";
 while(<CONF>) {
     next if /^\s*#/;
-    if(/^RepoName=(.+?)(\s+#|$)/) {
+    if(/^RepoName=(.+?)\s*(?:#|$)/) {
         $repo{name} = $1;
-        next;
     }
-    if(/^RepoDir=(.+?)(\s+#|$)/) {
+    if(/^RepoDir=(.+?)\s*(?:#|$)/) {
         $repo{dir} = $1;
-        next;
     }
     if(/^Colour=yes/ && -t STDOUT) {
         $col = 1;
-        next;
     }
-    if(/^BuildDir=(.+?)(\s+#|$)/) {
+    if(/^BuildDir=(.+?)\s*(?:#|$)/) {
         $tmpdir = $1;
-        next;
     }
     if(/^UserConfig=no/) {
         $uconf = 0;
-        next;
     }
-    if(/^PacmanBin=(.+?)(\s+#|$)/) {
+    if(/^PacmanBin=(.+?)\s*(?:#|$)/) {
         $pacmanbin = $1;
+    }
+    if(/^MakepkgOpts='(.+?)'\s*(?:#|$)/) {
+        $makepkgopt = $1;
     }
 }
 if($uconf && stat("$ENV{HOME}/.steamroller.conf")) {
@@ -79,22 +78,21 @@ if($uconf && stat("$ENV{HOME}/.steamroller.conf")) {
         next if /^\s*#/;
         if(/^RepoName=(.+?)(\s+#|$)/) {
             $repo{name} = $1;
-            next;
         }
         if(/^RepoDir=(.+?)(\s+#|$)/) {
             $repo{dir} = $1;
-            next;
         }
         if(/^Colour=yes/ && -t STDOUT) {
             $col = 1;
-            next;
         }
         if(/^BuildDir=(.+?)(\s+#|$)/) {
             $tmpdir = $1;
-            next;
         }
         if(/^PacmanBin=(.+?)(\s+#|$)/) {
             $pacmanbin = $1;
+        }
+        if(/^MakepkgOpts='(.+?)'\s*(?:#|$)/) {
+            $makepkgopt = $1;
         }
     }
 }
@@ -203,7 +201,8 @@ EOI
     print "$msg Retreiving sources from AUR...\n";
     foreach(@pkgs) { # Generate list of AUR dependencies
         getaurpkg $_ ||
-        die "$err $_ not found on the AUR\n";
+        warn "$err $_ not found on the AUR\n" &&
+        next;
         push @deplist, finddeps $_;
     }
 #       Prepend each AUR dependency to the list of pkgs to add to the repo
@@ -212,7 +211,7 @@ EOI
     while($_ = pop @deplist) {
         unshift @pkgs, $_;
         getaurpkg $_ ||
-        die "$err $_ not found on the AUR\n";
+        die "$err $_ not found in sync database or on AUR\n";
         unshift @deplist, finddeps $_;
     }
 
