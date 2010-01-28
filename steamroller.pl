@@ -267,3 +267,13 @@ if($mode{U}) {
     exit 0;
 }
 
+if($mode{R}) {
+    foreach(@pkgs) {
+        reporemove $_;
+    }
+    exit 0;
+}
+
+print "$err No operation specified\n";
+exit 2;
+
