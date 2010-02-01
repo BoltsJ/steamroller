@@ -14,6 +14,8 @@ B<steamroller> S<-Ss search term>
 
 B<steamroller> S<-U path/to/taurball.tar.gz>
 
+B<steamroller> S<-R [-n] package name ...>
+
 =head1 DESCRIPTION
 
 Steamroller is an AUR helper that places built packages into a local repo where L<pacman(8)> can install from.  Steamroller is designed to have similar syntax to pacman.
@@ -41,6 +43,14 @@ When passed with -S, perform a search of the AUR for the string provided.
 =item -U, --upgrade
 
 Build packages from specified taurballs and add them to the local repo.
+
+=item -R, --remove
+
+Remove packages specified from the local repo.
+
+=item -n, --no-save
+
+Delete all package files for specified packages when passed with -R.
 
 =item -q, --quiet
 

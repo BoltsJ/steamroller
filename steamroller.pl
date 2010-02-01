@@ -107,16 +107,20 @@ while($_ = shift) {
     if(/^-[^-]/) {
         $mode{S} = 1 if /S/;
         $mode{U} = 1 if /U/;
+        $mode{R} = 1 if /R/;
         $mode{s} = 1 if /s/;
         $mode{i} = 1 if /i/;
         $mode{u} = 1 if /u/;
+        $mode{n} = 1 if /n/;
         $mode{q} = 1 if /q/;
     }
     $mode{S} = 1 if /^--sync$/;
     $mode{U} = 1 if /^--upgrade$/;
+    $mode{R} = 1 if /^--remove$/;
     $mode{s} = 1 if /^--search$/;
     $mode{i} = 1 if /^--info$/;
     $mode{u} = 1 if /^--update$/;
+    $mode{n} = 1 if /^--no-save$/;
     $mode{q} = 1 if /^--quiet$/;
     push @pkgs, $_ if /^[^-]/;
 }
@@ -270,6 +274,18 @@ if($mode{U}) {
 if($mode{R}) {
     foreach(@pkgs) {
         reporemove $_;
+        if($mode{n}) {
+            opendir REPODIR, $repo{dir} or
+            warn "$err Could not open repo dir\n";
+            my @dir = readdir REPODIR;
+            closedir REPODIR;
+
+            foreach my $i (@dir) {
+                if($i =~ m/^($_-\d.*-\d+-(?:i686|x86_64|any)\.pkg\.tar\.gz)$/) {
+                    unlink "$repo{dir}/$1";
+                }
+            }
+        }
     }
     exit 0;
 }
