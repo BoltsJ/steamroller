@@ -273,15 +273,17 @@ if($mode{U}) {
 
 if($mode{R}) {
     foreach(@pkgs) {
-        reporemove $_;
+        reporemove $_ or
+            warn "$err $_ could not be removed\n";
         if($mode{n}) {
             opendir REPODIR, $repo{dir} or
-            warn "$err Could not open repo dir\n";
+            die "$err Could not open repo dir\n";
             my @dir = readdir REPODIR;
             closedir REPODIR;
 
             foreach my $i (@dir) {
                 if($i =~ m/^($_-\d.*-\d+-(?:i686|x86_64|any)\.pkg\.tar\.gz)$/) {
+                    print "$msg Deleting $1 from repo dir\n";
                     unlink "$repo{dir}/$1";
                 }
             }
