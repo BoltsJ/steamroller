@@ -93,6 +93,17 @@ sub repoadd ($) {
     return 1;
 }
 
+sub reporemove ($) {
+    our %repo;
+
+    my $pkg = pop;
+
+    system("/usr/bin/repo-remove $repo{dir}/$repo{name}.db.tar.gz $pkg") &&
+    return 0;
+
+    return 1;
+}
+
 sub pacsy () {
     our $pacmanbin;
 
