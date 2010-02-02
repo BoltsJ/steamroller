@@ -34,10 +34,14 @@ OPTIONS:
     -S, --sync : Retrieve taurball for specified packages, build them and add
         them to the repo
     -U, --upgrade : Build and add package to the repo from a local taurball
+    -R, --remove : remove package from local repo
 
   Sync Options:
     -u, --update : Check AUR for updates to packages, and build and add to
         any updates found.
     -i, --info : Get package information from AUR
     -s, --search : Search AUR for string specified.
+
+  Remove Options:
+    -n, --no-save : Delete packages removed from the repo
 
