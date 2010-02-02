@@ -274,7 +274,7 @@ if($mode{U}) {
 if($mode{R}) {
     foreach(@pkgs) {
         reporemove $_ or
-            warn "$err $_ could not be removed\n";
+            die "$err $_ could not be removed\n";
         if($mode{n}) {
             opendir REPODIR, $repo{dir} or
             die "$err Could not open repo dir\n";
