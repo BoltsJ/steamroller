@@ -69,7 +69,7 @@ sub makepkg ($) {
     @sources = readdir BUILDDIR;
     closedir BUILDDIR;
 
-    foreach(@sources) {
+    foreach(sort @sources) {
         $pkgf = $_ if /$pkg-.+-.+-.+\.pkg\.tar\.gz/;
     }
     system("cp $pkgf $tmpdir");
