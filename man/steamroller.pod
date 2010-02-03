@@ -1,6 +1,7 @@
 =head1 NAME
 
-steamroller - An AUR helper that creates a local repo from which pacman installs packages.
+steamroller - An AUR helper that creates a local repo from which pacman
+installs packages.
 
 =head1 SYNOPSIS
 
@@ -18,7 +19,9 @@ B<steamroller> S<-R [-n] package name ...>
 
 =head1 DESCRIPTION
 
-Steamroller is an AUR helper that places built packages into a local repo where L<pacman(8)> can install from.  Steamroller is designed to have similar syntax to pacman.
+Steamroller is an AUR helper that places built packages into a local repo
+where L<pacman(8)> can install from.  Steamroller is designed to have similar
+syntax to pacman.
 
 =head1 OPTIONS
 
@@ -26,11 +29,13 @@ Steamroller is an AUR helper that places built packages into a local repo where 
 
 =item -S, --sync
 
-Synchronise specified package list from AUR, resolving AUR dependencies, and add the built packages to the local repo.
+Synchronise specified package list from AUR, resolving AUR dependencies, and
+add the built packages to the local repo.
 
 =item -u, --update
 
-When passed with -S, check the AUR for updates to packages in the local repo and build 
+When passed with -S, check the AUR for updates to packages in the local repo
+and build them.
 
 =item -i, --info
 
@@ -54,7 +59,8 @@ Delete all package files for specified packages when passed with -R.
 
 =item -q, --quiet
 
-Suppress some messages during operation.
+Suppress some messages during operation.  Currently only makes -Ss output
+display only the package names.
 
 =back
 
@@ -71,6 +77,10 @@ The system-wide configuration file.
 Per-user configuration file.
 
 =back
+
+=head1 BUGS
+
+Report bugs at http://github.com/Bolts/steamroller/issues 
 
 =head1 AUTHORS
 

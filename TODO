@@ -1,3 +1,5 @@
 1 ) Clean up code  HA!
-2 ) Removal function
+2 ) Removal function - Improve
 3 ) More pacman integration?
+4 ) Coloured versions of repo-add and repo-remove
+    (maybe implement in pure Perl)
