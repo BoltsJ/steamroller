@@ -6,10 +6,16 @@ our @EXPORT = qw(exttaurball finddeps makepkg repoadd pacsy);
 sub exttaurball ($) {
     our $tmpdir;
 
+    my $exdir;
+
     my $taurball = shift;
 
     chdir $tmpdir;
-    system("/usr/bin/bsdtar -xf $taurball.tar.gz") &&
+    $exdir = `/usr/bin/bsdtar -tf $taurball.tar.gz`;
+    $exdir =~ m/^([^\/]+)$/m;
+    $exdir = $1;
+
+    system("/usr/bin/bsdtar -xf $taurball.tar.gz -s/$exdir/$taurball/g") &&
     return 0;
     return 1;
 }
@@ -69,7 +75,7 @@ sub makepkg ($) {
     @sources = readdir BUILDDIR;
     closedir BUILDDIR;
 
-    foreach(@sources) {
+    foreach(sort @sources) {
         $pkgf = $_ if /$pkg-.+-.+-.+\.pkg\.tar\.gz/;
     }
     system("cp $pkgf $tmpdir");

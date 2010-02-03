@@ -255,7 +255,7 @@ if($mode{U}) {
     foreach(@pkgs) {
         mkdir $tmpdir;
         my $upkg = `/usr/bin/bsdtar -xOf $_ */PKGBUILD`;
-        $upkg =~ /pkgname=(.+)\n/;
+        $upkg =~ /^pkgname=(.+)$/m;
         $upkg = $1;
         push @upkgs, $upkg;
         system("cp $_ $tmpdir/$upkg.tar.gz");
