@@ -6,10 +6,16 @@ our @EXPORT = qw(exttaurball finddeps makepkg repoadd pacsy);
 sub exttaurball ($) {
     our $tmpdir;
 
+    my $basedir;
+
     my $taurball = shift;
 
     chdir $tmpdir;
-    system("/usr/bin/bsdtar -xf $taurball.tar.gz") &&
+    $basedir = `/usr/bin/bsdtar -tf $tarball.tar.gz`;
+    $basedir =~ m/^(.+)\/$/m;
+    $basedir = $1;
+
+    system("/usr/bin/bsdtar -xf $taurball.tar.gz -s/$basedir/$taurball/g") &&
     return 0;
     return 1;
 }
