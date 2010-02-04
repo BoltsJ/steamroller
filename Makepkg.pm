@@ -12,7 +12,7 @@ sub exttaurball ($) {
 
     chdir $tmpdir;
     $exdir = `/usr/bin/bsdtar -tf $taurball.tar.gz`;
-    $exdir =~ m/^([^\/]+)$/m;
+    $exdir =~ m/^([^\/]+)\/$/m;
     $exdir = $1;
 
     system("/usr/bin/bsdtar -xf $taurball.tar.gz -s/$exdir/$taurball/g") &&
