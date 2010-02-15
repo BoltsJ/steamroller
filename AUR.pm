@@ -63,12 +63,13 @@ sub aurinfo ($) {
     $pkgbuild = get $aururl;
     return () unless $pkgbuild;
     
-    %info = $pkgbuild =~ m/^(\w+)=(\([^\(\)]+\)|[^\(\)\n]+)$/mg;
+    %info = $pkgbuild =~ m/^(\w+)=(\([^\(\)]+\)|[^\n]+)$/mg;
 
     foreach(@fields) {
         $pkginf{$_} = $info{$_} || "None";
         $pkginf{$_} =~ s/\s+/ /g;
-        $pkginf{$_} =~ s/[\(\)'"]//g;
+        $pkginf{$_} =~ s/"//g if $pkginf{$_} =~ m/^"/;
+        $pkginf{$_} =~ s/[\(\)'"]//g if $pkginf{$_} =~ m/^\(/;
         $pkginf{$_} =~ s/\$pkgver/$info{pkgver}/g;
     }
 
