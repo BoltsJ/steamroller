@@ -29,7 +29,7 @@ our $col = 0;
 our $msg = "==>";
 our $inf = "  ->";
 our $err = "==> ERROR:";
-our $makepkgopt = '';
+our $makepkgopt = ' ';
 
 my @pkgs;
 my %mode;
