@@ -45,6 +45,10 @@ When passed with -S, display info about an AUR package.
 
 When passed with -S, perform a search of the AUR for the string provided.
 
+=item -c, --clean
+
+When passed with -S, clean old packages from the repo directory.
+
 =item -U, --upgrade
 
 Build packages from specified taurballs and add them to the local repo.

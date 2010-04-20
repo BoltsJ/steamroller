@@ -29,7 +29,7 @@ our $col = 0;
 our $msg = "==>";
 our $inf = "  ->";
 our $err = "==> ERROR:";
-our $makepkgopt = '';
+our $makepkgopt = ' ';
 
 my @pkgs;
 my %mode;
@@ -110,6 +110,7 @@ while($_ = shift) {
         $mode{R} = 1 if /R/;
         $mode{s} = 1 if /s/;
         $mode{i} = 1 if /i/;
+        $mode{c} = 1 if /c/;
         $mode{u} = 1 if /u/;
         $mode{n} = 1 if /n/;
         $mode{q} = 1 if /q/;
@@ -119,6 +120,7 @@ while($_ = shift) {
     $mode{R} = 1 if /^--remove$/;
     $mode{s} = 1 if /^--search$/;
     $mode{i} = 1 if /^--info$/;
+    $mode{c} = 1 if /^--clean$/;
     $mode{u} = 1 if /^--update$/;
     $mode{n} = 1 if /^--no-save$/;
     $mode{q} = 1 if /^--quiet$/;
@@ -134,6 +136,7 @@ if($col) {
 }
 
 if($mode{S}) {
+
     if($mode{i}) {
         die "$err No packages specified\n" unless @pkgs;
         my %pkginf;
@@ -194,6 +197,28 @@ EOI
         }
         exit 0;
     }
+
+    if($mode{c}) {
+        my %repopkgs = `/usr/bin/bsdtar -tf $repo{dir}/$repo{name}.db.tar.gz` =~
+            m#(.+)-(\d.*-\d+)/#g;
+        opendir REPODIR, $repo{dir};
+        my @dir = readdir REPODIR;
+        closedir REPODIR;
+
+        my @del;
+
+        DEL: foreach my $i (@dir) {
+            next unless $i =~ /\.pkg\.tar\.gz$/;
+            foreach my $j (keys %repopkgs) {
+                my $ver = $repopkgs{$j};
+                next DEL if $i =~ /^$j-$ver-(?:i686|x86_64|any)\.pkg/;
+            }
+            push @del, "$repo{dir}/$i";
+        }
+        unlink @del;
+        exit 0;
+    }
+
     if($mode{u}) {
         @pkgs = aurcheck or
         print "$msg Local repo is up to date with AUR\n";
