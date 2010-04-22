@@ -208,7 +208,7 @@ EOI
         my @del;
 
         DEL: foreach my $i (@dir) {
-            next unless $i =~ /\.pkg\.tar\.gz$/;
+            next unless $i =~ /\.pkg\.tar\.(?:g|x)z$/;
             foreach my $j (keys %repopkgs) {
                 my $ver = $repopkgs{$j};
                 next DEL if $i =~ /^$j-$ver-(?:i686|x86_64|any)\.pkg/;
