@@ -208,7 +208,7 @@ EOI
         my @del;
 
         DEL: foreach my $i (@dir) {
-            next unless $i =~ /\.pkg\.tar\.gz$/;
+            next unless $i =~ /\.pkg\.tar\.(?:g|x)z$/;
             foreach my $j (keys %repopkgs) {
                 my $ver = $repopkgs{$j};
                 next DEL if $i =~ /^$j-$ver-(?:i686|x86_64|any)\.pkg/;
@@ -307,7 +307,7 @@ if($mode{R}) {
             closedir REPODIR;
 
             foreach my $i (@dir) {
-                if($i =~ m/^($_-\d.*-\d+-(?:i686|x86_64|any)\.pkg\.tar\.gz)$/) {
+                if($i =~ m/^($_-\d.*-\d+-(?:i686|x86_64|any)\.pkg\.tar\.(?:gz|xz))$/) {
                     print "$msg Deleting $1 from repo dir\n";
                     unlink "$repo{dir}/$1";
                 }
