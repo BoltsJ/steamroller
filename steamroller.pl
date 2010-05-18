@@ -307,7 +307,7 @@ if($mode{R}) {
             closedir REPODIR;
 
             foreach my $i (@dir) {
-                if($i =~ m/^($_-\d.*-\d+-(?:i686|x86_64|any)\.pkg\.tar\.gz)$/) {
+                if($i =~ m/^($_-\d.*-\d+-(?:i686|x86_64|any)\.pkg\.tar\.(?:gz|xz))$/) {
                     print "$msg Deleting $1 from repo dir\n";
                     unlink "$repo{dir}/$1";
                 }
