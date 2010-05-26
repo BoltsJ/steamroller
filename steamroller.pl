@@ -29,6 +29,7 @@ our $col = 0;
 our $msg = "==>";
 our $inf = "  ->";
 our $err = "==> ERROR:";
+our $wrn = "==> WARNING:";
 our $makepkgopt = ' ';
 
 my @pkgs;
@@ -133,6 +134,7 @@ if($col) {
     $err = "\e[31;1m==> ERROR:\e[0m";
     $inf = "\e[34;1m  ->\e[0m";
     $msg = "\e[32;1m==>\e[0m";
+    $wrn = "\e[33;1m==> WARNING:\e[0m";
 }
 
 if($mode{S}) {
@@ -231,7 +233,7 @@ EOI
     print "$msg Retreiving sources from AUR...\n";
     foreach(@pkgs) { # Generate list of AUR dependencies
         getaurpkg $_ ||
-        warn "$err $_ not found on the AUR\n" &&
+        warn "$wrn $_ not found on the AUR\n" &&
         next;
         push @deplist, finddeps $_;
         push @apkgs, $_;
@@ -243,9 +245,9 @@ EOI
 #       then check its dependencies
     print "$msg Resolving dependencies...\n";
     while($_ = pop @deplist) {
-#       unshift @apkgs, $_;
-        (getaurpkg $_ && unshift @apkgs, $_ ) ||
-        warn "$err $_ not found in sync database or on AUR\n";
+        getaurpkg $_ ||
+        (warn "$wrn $_ not found in sync database or on AUR\n" and next);
+        unshift @apkgs, $_;
         unshift @deplist, finddeps $_;
     }
 
