@@ -243,8 +243,8 @@ EOI
 #       then check its dependencies
     print "$msg Resolving dependencies...\n";
     while($_ = pop @deplist) {
-        unshift @apkgs, $_;
-        getaurpkg $_ ||
+#       unshift @apkgs, $_;
+        (getaurpkg $_ && unshift @apkgs, $_ ) ||
         warn "$err $_ not found in sync database or on AUR\n";
         unshift @deplist, finddeps $_;
     }
