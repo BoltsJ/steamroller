@@ -245,7 +245,7 @@ EOI
     while($_ = pop @deplist) {
         unshift @apkgs, $_;
         getaurpkg $_ ||
-        die "$err $_ not found in sync database or on AUR\n";
+        warn "$err $_ not found in sync database or on AUR\n";
         unshift @deplist, finddeps $_;
     }
 
