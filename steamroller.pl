@@ -233,8 +233,7 @@ EOI
     print "$msg Retreiving sources from AUR...\n";
     foreach(@pkgs) { # Generate list of AUR dependencies
         getaurpkg $_ ||
-        warn "$wrn $_ not found on the AUR\n" &&
-        next;
+        (warn "$wrn $_ not found on the AUR\n" and next);
         push @deplist, finddeps $_;
         push @apkgs, $_;
     }
