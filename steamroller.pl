@@ -190,11 +190,12 @@ EOI
             }
         } else {
             foreach(@results) {
-                printf "%sAUR/%s$_->{Name} %s$_->{Version}%s\n    $_->{Description}\n",
+                printf "%sAUR/%s$_->{Name} %s$_->{Version}%s%s\n    $_->{Description}\n",
                 $col ? "\e[35;1m" : "",
                 $col ? "\e[0;1m"  : "",
                 $col ? "\e[32;1m" : "",
-                $col ? "\e[0m"    : "";
+                $col ? "\e[0m"    : "",
+                $_->{OutOfDate} ? $col ? "\e[31;1m (Out of date)\e[0m" : " (Out of date)" : "";
             }
         }
         exit 0;
