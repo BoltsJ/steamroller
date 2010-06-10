@@ -86,6 +86,9 @@ Per-user configuration file.
 
 Report bugs at http://github.com/Bolts/steamroller/issues 
 
+Packages built from PKGBUILDs that create multiple packages won't be recognised
+if their name doesn't match the name used to get the taurball.
+
 =head1 AUTHORS
 
 Joseph R. Nosie <bolts at archlinux dot us>
