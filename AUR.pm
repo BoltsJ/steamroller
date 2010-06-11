@@ -52,11 +52,16 @@ sub aursearch ($) {
 }
 
 sub aurinfo ($) {
+    our $aurrpc;
+
     my $pkg = shift;
     my $aururl = "http://aur.archlinux.org/packages/$pkg/$pkg/PKGBUILD";
     my @fields = qw(pkgname pkgver pkgrel url license groups provides depends optdepends conflicts replaces pkgdesc);
     my $pkgbuild;
     my %info;
+
+    my $json;
+    my $data;
 
     my %pkginf;
 
@@ -72,6 +77,17 @@ sub aurinfo ($) {
         $pkginf{$_} =~ s/[\(\)'"]//g if $pkginf{$_} =~ m/^\(/;
         $pkginf{$_} =~ s/\$pkgver/$info{pkgver}/g;
     }
+
+    $json = get("$aurrpc?type=info&arg=$pkg");
+    $data = decode_json $json;
+    if($data->{type} eq 'error') {
+        return ();
+    } else {
+        if($data->{results}->{OutOfDate} == 1) {
+            $pkginf{ood} = 1;
+        }
+    }
+
 
     return %pkginf;
 }

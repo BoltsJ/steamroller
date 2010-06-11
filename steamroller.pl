@@ -159,10 +159,21 @@ if($mode{S}) {
             %pkginf = aurinfo $_;
 
             die "$err $_ not found in AUR\n" unless scalar %pkginf;
+
+            if($pkginf{ood}) {
+                if($col) {
+                    $pkginf{version} = "$pkginf{pkgver}-$pkginf{pkgrel} \e[31;1m(Out of date)";
+                } else {
+                    $pkginf{version} = "$pkginf{pkgver}-$pkginf{pkgrel} (Out of date)";
+                }
+            } else {
+                $pkginf{version} = "$pkginf{pkgver}-$pkginf{pkgrel}";
+            }
+
             printf <<EOI, @fmt;
 %sRepository      : %sAUR
 %sName            : %s$pkginf{pkgname}
-%sVersion         : %s$pkginf{pkgver}-$pkginf{pkgrel}
+%sVersion         : %s$pkginf{version}
 %sURL             : %s$pkginf{url}
 %sLicenses        : %s$pkginf{license}
 %sGroups          : %s$pkginf{groups}
