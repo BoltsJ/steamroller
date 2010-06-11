@@ -32,7 +32,7 @@ sub finddeps ($) {
 
     if($pkgbuild =~ /\ndepends=\(([^)]+)\)/) {
         $deps = $1;
-        while($deps =~ s/'([^ ']+)'// || $deps =~ s/"([^ "]+)"//) {
+        while($deps =~ s/'([^ ']+)'// || $deps =~ s/"([^ "]+)"// || $deps =~ s/([^ ]+)//) {
             my $i = $1;
             $i =~ s/^([^=<>]+).*?$/$1/;
             push @deplist, $i unless $paclst =~ m/^$i$/m;
