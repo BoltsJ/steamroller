@@ -38,8 +38,8 @@ my %mode;
 # Default Values
 our $editor = $ENV{EDITOR} ||
     $ENV{VISUAL} || (
-    "/usr/bin/vi" &&
-    warn "\$EDITOR and \$VISUAL are not set. Using `vi`\n"
+    warn "\$EDITOR and \$VISUAL are not set. Using `vi`\n" and
+    "/usr/bin/vi"
 );
 my $uconf = 1;
 our $pacmanbin = "/usr/bin/pacman";
@@ -68,7 +68,7 @@ while(<CONF>) {
     if(/^PacmanBin=(.+?)\s*(?:#|$)/) {
         $pacmanbin = $1;
     }
-    if(/^MakepkgOpts='(.+?)'\s*(?:#|$)/) {
+    if(/^MakepkgFlags='(.+?)'\s*(?:#|$)/) {
         $makepkgopt = $1;
     }
 }
