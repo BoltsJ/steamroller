@@ -38,8 +38,8 @@ my %mode;
 # Default Values
 our $editor = $ENV{EDITOR} ||
     $ENV{VISUAL} || (
-    "/usr/bin/vi" &&
-    warn "\$EDITOR and \$VISUAL are not set. Using `vi`\n"
+    warn "\$EDITOR and \$VISUAL are not set. Using `vi`\n" and
+    "/usr/bin/vi"
 );
 my $uconf = 1;
 our $pacmanbin = "/usr/bin/pacman";
@@ -68,7 +68,7 @@ while(<CONF>) {
     if(/^PacmanBin=(.+?)\s*(?:#|$)/) {
         $pacmanbin = $1;
     }
-    if(/^MakepkgOpts='(.+?)'\s*(?:#|$)/) {
+    if(/^MakepkgFlags='(.+?)'\s*(?:#|$)/) {
         $makepkgopt = $1;
     }
 }
@@ -159,10 +159,21 @@ if($mode{S}) {
             %pkginf = aurinfo $_;
 
             die "$err $_ not found in AUR\n" unless scalar %pkginf;
+
+            if($pkginf{ood}) {
+                if($col) {
+                    $pkginf{version} = "$pkginf{pkgver}-$pkginf{pkgrel} \e[31;1m(Out of date)";
+                } else {
+                    $pkginf{version} = "$pkginf{pkgver}-$pkginf{pkgrel} (Out of date)";
+                }
+            } else {
+                $pkginf{version} = "$pkginf{pkgver}-$pkginf{pkgrel}";
+            }
+
             printf <<EOI, @fmt;
 %sRepository      : %sAUR
 %sName            : %s$pkginf{pkgname}
-%sVersion         : %s$pkginf{pkgver}-$pkginf{pkgrel}
+%sVersion         : %s$pkginf{version}
 %sURL             : %s$pkginf{url}
 %sLicenses        : %s$pkginf{license}
 %sGroups          : %s$pkginf{groups}
@@ -190,11 +201,12 @@ EOI
             }
         } else {
             foreach(@results) {
-                printf "%sAUR/%s$_->{Name} %s$_->{Version}%s\n    $_->{Description}\n",
+                printf "%sAUR/%s$_->{Name} %s$_->{Version}%s%s\n    $_->{Description}\n",
                 $col ? "\e[35;1m" : "",
                 $col ? "\e[0;1m"  : "",
                 $col ? "\e[32;1m" : "",
-                $col ? "\e[0m"    : "";
+                $col ? "\e[0m"    : "",
+                $_->{OutOfDate} ? $col ? "\e[31;1m (Out of date)\e[0m" : " (Out of date)" : "";
             }
         }
         exit 0;
