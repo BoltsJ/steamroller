@@ -1,0 +1,8 @@
+LICENSE
+Makefile.PL
+MANIFEST
+README
+bin/steamroller
+conf/steamroller.conf
+lib/Bolts/Steamroller/AUR.pm
+lib/Bolts/Steamroller/Makepkg.pm
