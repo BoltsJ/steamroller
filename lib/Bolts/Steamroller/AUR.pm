@@ -2,97 +2,87 @@ use strict;
 use warnings;
 use LWP::Simple qw(get getstore is_error);
 use JSON qw(decode_json);
-
-require Exporter;
-our @EXPORT = qw(getaurpkg aursearch aurinfo aurcheck);
+package Bolts::Steamroller::AUR;
 
 our $aurrpc = "http://aur.archlinux.org/rpc.php";
 
-sub getaurpkg ($) {
+sub new {
+    my ($class, @args) = @_;
+
+    my $self = { };
+
+    bless $self, "Bolts::Steamroller::AUR";
+
+    return $self;
+}
+
+sub get {
+    my $self = shift;
+    my $name = shift;
+
     our $tmpdir;
-    our $inf;
+    our %messages;
 
-    my $pkg = shift;
-    my $aururl = "http://aur.archlinux.org/packages/$pkg/$pkg.tar.gz";
-    my $resp;
-
-    mkdir $tmpdir;
-
-    print "$inf $_...";
-    $resp = getstore($aururl, "$tmpdir/$pkg.tar.gz");
-    if(is_error($resp)) {
-        print "failed.\n";
-        return 0;
-    } else {
+    $self->{url} = "http://aur.archlinux.org/packages/$name/$name.tar.gz";
+    $self->{tarball} = "$tmpdir/$name.tar.gz"
+    print "$messages{info} $name...";
+    $self->{response} = !is_erorr(getstore($self->{url}, $self->{tarball}));
+    if($self->{response}) {
         print " done.\n";
-        return "$tmpdir/$pkg.tar.gz";
-    }
-}
-
-sub aursearch ($) {
-    our $aurrpc;
-
-    my $arg = shift;
-    my $json;
-
-    my $data;
-
-
-
-    return () unless $arg;
-
-    $json = get("$aurrpc?type=search&arg=$arg");
-    $data = decode_json $json;
-
-    if($data->{type} eq 'error') {
-        return ();
     } else {
-        return @{$data->{results}};
+        print " failed.\n";
     }
+
+    return $self->{response};
 }
 
-sub aurinfo ($) {
-    our $aurrpc;
 
-    my $pkg = shift;
-    my $aururl = "http://aur.archlinux.org/packages/$pkg/$pkg/PKGBUILD";
+
+
+sub search {
+    my $self = shift;
+    my $terms = join @_, '+';
+
+    my $json = get("$aurrpc?type=search&arg=$terms");
+
+    $self->{data} = decode_json $json;
+
+    return $self->{data}->{type};
+}
+
+sub info {
+    my $self = shift;
+    my $name = shift;
+
     my @fields = qw(pkgname pkgver pkgrel url license groups provides depends optdepends conflicts replaces pkgdesc);
-    my $pkgbuild;
     my %info;
 
-    my $json;
-    my $data;
+    my $pkgbuild = get("http://aur.archlinux.org/packages/$name/$name/PKGBUILD");
+    my $json = get("$aurrpc?type=info&arg=$name");
 
-    my %pkginf;
+    return 'error' unless $pkgbuild;
+    return 'error' unless $json->{type} eq 'info';
 
-    $pkgbuild = get $aururl;
-    return () unless $pkgbuild;
-    
     %info = $pkgbuild =~ m/^(\w+)=(\([^\(\)]+\)|[^\n]+)$/mg;
 
     foreach(@fields) {
-        $pkginf{$_} = $info{$_} || "None";
-        $pkginf{$_} =~ s/\s+/ /g;
-        $pkginf{$_} =~ s/"//g if $pkginf{$_} =~ m/^"/;
-        $pkginf{$_} =~ s/[\(\)'"]//g if $pkginf{$_} =~ m/^\(/;
-        $pkginf{$_} =~ s/\$pkgver/$info{pkgver}/g;
+        $self->{info}->{$_} = $info{$_} || "None";
+        $self->{info}->{$_} =~ s/\s+/ /g;
+        $self->{info}->{$_} =~ s/"//g if $pkginf{$_} =~ m/^"/;
+        $self->{info}->{$_} =~ s/[\(\)'"]//g if $pkginf{$_} =~ m/^\(/;
+        $self->{info}->{$_} =~ s/\$pkgver/$info{pkgver}/g;
     }
 
-    $json = get("$aurrpc?type=info&arg=$pkg");
-    $data = decode_json $json;
-    if($data->{type} eq 'error') {
-        return ();
-    } else {
-        if($data->{results}->{OutOfDate} == 1) {
-            $pkginf{ood} = 1;
-        }
-    }
+    $info{ood} = decode_json $json;
+    $self->{info}->{ood} = $json->{results}->{OutOfDate} == 1;
 
-
-    return %pkginf;
+    return $self->{info};
 }
 
+return 1;
 
+
+__END__
 sub aurcheck () {
     our $aurrpc;
     our %repo;
