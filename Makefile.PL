@@ -7,7 +7,7 @@ WriteMakefile(
     LICENSE     => 'GPL',
     EXE_FILES   => [ 'bin/steamroller' ],
     PREREQ_PM   => {
-        'JSON'          => '2.21',
-        'LWP::Simple'   => '5.835',
+        'JSON'          => '0',
+        'LWP::Simple'   => '0',
     },
 );
