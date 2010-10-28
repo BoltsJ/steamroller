@@ -1,31 +1,37 @@
 use strict;
 use warnings;
 use LWP::Simple qw(get getstore is_error);
+use LWP::UserAgent;
 use JSON qw(decode_json);
 
 require Exporter;
 our @EXPORT = qw(getaurpkg aursearch aurinfo aurcheck);
 
-our $aurrpc = "http://aur.archlinux.org/rpc.php";
+our $aurrpc = "https://aur.archlinux.org/rpc.php";
 
 sub getaurpkg ($) {
     our $tmpdir;
     our $inf;
 
     my $pkg = shift;
-    my $aururl = "http://aur.archlinux.org/packages/$pkg/$pkg.tar.gz";
+    my $aururl = "https://aur.archlinux.org/packages/$pkg/$pkg.tar.gz";
+    my $ua = LWP::UserAgent->new;
     my $resp;
 
     mkdir $tmpdir;
 
     print "$inf $_...";
-    $resp = getstore($aururl, "$tmpdir/$pkg.tar.gz");
-    if(is_error($resp)) {
+    #$resp = getstore($aururl, "$tmpdir/$pkg.tar.gz");
+    $resp = $ua->get($aururl);
+    if($resp->is_success) {
+        print " done.\n";
+        open(TARBALL,">>$tmpdir/$pkg.tar.gz");
+        print TARBALL $resp->content;
+        close TARBALL;
+        return "$tmpdir/$pkg.tar.gz";
+    } else {
         print "failed.\n";
         return 0;
-    } else {
-        print " done.\n";
-        return "$tmpdir/$pkg.tar.gz";
     }
 }
 
@@ -34,6 +40,7 @@ sub aursearch ($) {
 
     my $arg = shift;
     my $json;
+    my $ua = LWP::UserAgent->new;
 
     my $data;
 
@@ -41,8 +48,8 @@ sub aursearch ($) {
 
     return () unless $arg;
 
-    $json = get("$aurrpc?type=search&arg=$arg");
-    $data = decode_json $json;
+    $json = $ua->get("$aurrpc?type=search&arg=$arg");
+    $data = decode_json $json->content;
 
     if($data->{type} eq 'error') {
         return ();
@@ -55,17 +62,18 @@ sub aurinfo ($) {
     our $aurrpc;
 
     my $pkg = shift;
-    my $aururl = "http://aur.archlinux.org/packages/$pkg/$pkg/PKGBUILD";
+    my $aururl = "https://aur.archlinux.org/packages/$pkg/$pkg/PKGBUILD";
     my @fields = qw(pkgname pkgver pkgrel url license groups provides depends optdepends conflicts replaces pkgdesc);
     my $pkgbuild;
     my %info;
+    my $ua = LWP::UserAgent->new;
 
     my $json;
     my $data;
 
     my %pkginf;
 
-    $pkgbuild = get $aururl;
+    $pkgbuild = $ua->get($aururl)->content;
     return () unless $pkgbuild;
     
     %info = $pkgbuild =~ m/^(\w+)=(\([^\(\)]+\)|[^\n]+)$/mg;
@@ -78,8 +86,8 @@ sub aurinfo ($) {
         $pkginf{$_} =~ s/\$pkgver/$info{pkgver}/g;
     }
 
-    $json = get("$aurrpc?type=info&arg=$pkg");
-    $data = decode_json $json;
+    $json = $ua->get("$aurrpc?type=info&arg=$pkg");
+    $data = decode_json $json->content;
     if($data->{type} eq 'error') {
         return ();
     } else {
@@ -100,6 +108,7 @@ sub aurcheck () {
 
     my $aurver;
     my %repopkgs;
+    my $ua = LWP::UserAgent->new;
 
     my @upgrades;
 
@@ -108,7 +117,7 @@ sub aurcheck () {
 
     print "$msg Checking for updates...\n";
     foreach(sort keys %repopkgs) {
-        $aurver = get("$aurrpc?type=info&arg=$_") ||
+        $aurver = $ua->get("$aurrpc?type=info&arg=$_")->content ||
         return 0;
         $aurver =~ s/.*"Version":"(.+?)".*/$1/ || next;
         push @upgrades, $_ if `/usr/bin/vercmp $aurver $repopkgs{$_}` == 1;
