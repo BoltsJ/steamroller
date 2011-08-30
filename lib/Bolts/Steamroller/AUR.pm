@@ -14,7 +14,7 @@ sub getaurpkg ($) {
     our $inf;
 
     my $pkg = shift;
-    my $aururl = "https://aur.archlinux.org/packages/$pkg/$pkg.tar.gz";
+    my $aururl = "http://aur.archlinux.org/packages/$pkg/$pkg.tar.gz";
     my $ua = LWP::UserAgent->new;
     my $resp;
 
@@ -62,7 +62,7 @@ sub aurinfo ($) {
     our $aurrpc;
 
     my $pkg = shift;
-    my $aururl = "https://aur.archlinux.org/packages/$pkg/PKGBUILD";
+    my $aururl = "http://aur.archlinux.org/packages/$pkg/PKGBUILD";
     my @fields = qw(pkgname pkgver pkgrel url license groups provides depends optdepends conflicts replaces pkgdesc);
     my $pkgbuild;
     my %info;
