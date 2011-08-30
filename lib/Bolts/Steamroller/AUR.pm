@@ -7,7 +7,7 @@ use JSON qw(decode_json);
 require Exporter;
 our @EXPORT = qw(getaurpkg aursearch aurinfo aurcheck);
 
-our $aurrpc = "https://aur.archlinux.org/rpc.php";
+our $aurrpc = "http://aur.archlinux.org/rpc.php";
 
 sub getaurpkg ($) {
     our $tmpdir;
