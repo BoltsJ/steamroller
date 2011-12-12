@@ -15,7 +15,7 @@ sub exttaurball ($) {
     $exdir =~ m/^([^\/]+)\/?/m;
     $exdir = $1;
 
-    system("/usr/bin/bsdtar -xf $taurball.tar.gz -s/$exdir/$taurball/g") &&
+    system("/usr/bin/bsdtar -xf $taurball.tar.gz -s'/$exdir/$taurball/'") &&
     return 0;
     return 1;
 }
